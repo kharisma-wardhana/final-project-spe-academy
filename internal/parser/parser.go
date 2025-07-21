@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 
+	apperr "github.com/kharisma-wardhana/final-project-spe-academy/error"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/helper"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	apperr "github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/error"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/helper"
 )
 
 type WithPathID interface {

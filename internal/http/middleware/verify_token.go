@@ -1,9 +1,10 @@
 package middleware
 
 import (
+	apperr "github.com/kharisma-wardhana/final-project-spe-academy/error"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/http/auth"
+
 	"github.com/gofiber/fiber/v2"
-	apperr "github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/error"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/http/auth"
 )
 
 func VerifyJWTToken(c *fiber.Ctx) error {

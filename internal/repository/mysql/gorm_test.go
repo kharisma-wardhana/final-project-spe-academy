@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/config"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/tests/mocks"
+	"github.com/kharisma-wardhana/final-project-spe-academy/config"
+	"github.com/kharisma-wardhana/final-project-spe-academy/tests/mocks"
 
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/repository/mysql"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/repository/mysql/entity"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql/entity"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/bxcodec/faker"

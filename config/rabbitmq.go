@@ -3,7 +3,7 @@ package config
 import (
 	"context"
 
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/queue"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/queue"
 )
 
 func NewRabbitMQInstance(ctx context.Context, cfg *RabbitMQOption) (*queue.RabbitMQ, error) {

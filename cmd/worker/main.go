@@ -7,10 +7,11 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/config"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/queue"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/queue/consumer"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/repository/mongodb"
+	"github.com/kharisma-wardhana/final-project-spe-academy/config"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/queue"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/queue/consumer"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mongodb"
+
 	"github.com/subosito/gotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 )

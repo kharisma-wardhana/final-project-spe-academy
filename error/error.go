@@ -3,7 +3,7 @@ package error
 import (
 	"net/http"
 
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/entity"
+	"github.com/kharisma-wardhana/final-project-spe-academy/entity"
 )
 
 func ErrRecordNotFound() CustomErrorResponse {

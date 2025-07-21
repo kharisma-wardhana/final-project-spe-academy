@@ -1,6 +1,6 @@
-module github.com/kharisma-wardhana/spe-academy-learn-golang/final-project
+module github.com/kharisma-wardhana/final-project-spe-academy
 
-go 1.24.2
+go 1.24.1
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0

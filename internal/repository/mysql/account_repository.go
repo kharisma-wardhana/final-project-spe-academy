@@ -3,8 +3,8 @@ package mysql
 import (
 	"context"
 
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/config"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/repository/mysql/entity"
+	"github.com/kharisma-wardhana/final-project-spe-academy/config"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql/entity"
 )
 
 type IAccountRepository interface {

@@ -11,16 +11,17 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/kharisma-wardhana/final-project-spe-academy/config"
+	_ "github.com/kharisma-wardhana/final-project-spe-academy/docs"
+	"github.com/kharisma-wardhana/final-project-spe-academy/entity"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/http/handler"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/parser"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/presenter/json"
+	usecase_log "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/log"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/swagger"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/config"
-	_ "github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/docs"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/entity"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/http/handler"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/parser"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/presenter/json"
-	usecase_log "github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/usecase/log"
 
 	"go.uber.org/zap"
 

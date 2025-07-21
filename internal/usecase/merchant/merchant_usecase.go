@@ -3,9 +3,9 @@ package usecase_merchant
 import (
 	"context"
 
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/helper"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/repository/mysql"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/usecase/merchant/entity"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/helper"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/merchant/entity"
 )
 
 type IMerchantUsecase interface {

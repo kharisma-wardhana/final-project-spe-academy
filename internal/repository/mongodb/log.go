@@ -3,8 +3,9 @@ package mongodb
 import (
 	"context"
 
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/helper"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/repository/mongodb/entity"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/helper"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mongodb/entity"
+
 	errwrap "github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/mongo"
 )

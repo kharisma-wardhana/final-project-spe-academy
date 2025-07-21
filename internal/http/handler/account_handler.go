@@ -3,9 +3,10 @@ package handler
 import (
 	"net/http"
 
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/parser"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/presenter/json"
+
 	"github.com/gofiber/fiber/v2"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/parser"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/presenter/json"
 )
 
 type AccountHandler struct {

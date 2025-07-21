@@ -5,8 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/config"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/entity"
+	"github.com/kharisma-wardhana/final-project-spe-academy/config"
+	"github.com/kharisma-wardhana/final-project-spe-academy/entity"
+
 	"go.uber.org/zap"
 )
 

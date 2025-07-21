@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	entity "github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/entity"
+	entity "github.com/kharisma-wardhana/final-project-spe-academy/entity"
 	mock "github.com/stretchr/testify/mock"
 )
 

@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/parser"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/presenter/json"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/parser"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/presenter/json"
 )
 
 type TransactionHandler struct {

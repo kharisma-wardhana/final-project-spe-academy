@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/kharisma-wardhana/final-project-spe-academy/config"
+	"github.com/kharisma-wardhana/final-project-spe-academy/entity"
+	mentity "github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql/entity"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/config"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/entity"
-	mentity "github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/repository/mysql/entity"
 )
 
 //go:embed private_key.pem

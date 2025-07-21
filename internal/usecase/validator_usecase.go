@@ -9,7 +9,7 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	id_translations "github.com/go-playground/validator/v10/translations/id"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/entity"
+	"github.com/kharisma-wardhana/final-project-spe-academy/entity"
 )
 
 // ValidatorUsecase is a usecase for custom validating data

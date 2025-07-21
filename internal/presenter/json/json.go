@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/entity"
-	apperr "github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/error"
+	"github.com/kharisma-wardhana/final-project-spe-academy/entity"
+	apperr "github.com/kharisma-wardhana/final-project-spe-academy/error"
 
 	"github.com/gofiber/fiber/v2"
 )

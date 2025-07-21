@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/config"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/entity"
-	usecase_log "github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/internal/usecase/log"
-	"github.com/kharisma-wardhana/spe-academy-learn-golang/final-project/tests/mocks"
+	"github.com/kharisma-wardhana/final-project-spe-academy/config"
+	"github.com/kharisma-wardhana/final-project-spe-academy/entity"
+	usecase_log "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/log"
+	"github.com/kharisma-wardhana/final-project-spe-academy/tests/mocks"
+
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/zap"
