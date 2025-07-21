@@ -16,7 +16,7 @@ type TransactionEntity struct {
 	Currency        string
 	Type            string
 	Issuer          string
-	Aquirer         string
+	Acquirer        string
 	CustomerMPAN    string
 	TransactionDate time.Time
 	SettlementDate  time.Time

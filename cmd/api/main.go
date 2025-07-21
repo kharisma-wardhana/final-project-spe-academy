@@ -17,7 +17,11 @@ import (
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/http/handler"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/parser"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/presenter/json"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql"
+	usecase_account "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/account"
 	usecase_log "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/log"
+	usecase_merchant "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/merchant"
+	usecase_transaction "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/transaction"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
@@ -83,16 +87,22 @@ func main() {
 	// AUTH : Write authetincation mechanism method (JWT, Basic Auth, etc.)
 
 	// REPOSITORY : Write repository code here (database, cache, etc.)
+	accountRepo := mysql.NewAccountRepository(mysqlDB)
+	merchantRepo := mysql.NewMerchantRepository(mysqlDB)
+	transactionRepo := mysql.NewTransactionRepository(mysqlDB)
 
 	// USECASE : Write bussines logic code here (validation, business logic, etc.)
 	_ = usecase_log.NewLogUsecase(queue, logger)
+	accountUseCase := usecase_account.NewAccountUseCase(accountRepo)
+	merchantUseCase := usecase_merchant.NewMerchantUseCase(merchantRepo)
+	transactionUseCase := usecase_transaction.NewTransactionUseCase(transactionRepo)
 
 	api := app.Group("/api/v1")
 
 	// HANDLER : Write handler code here (HTTP, gRPC, etc.)
-	handler.NewAccountHandler(parser, presenterJson).Register(api)
-	handler.NewMerchantHandler(parser, presenterJson).Register(api)
-	handler.NewTransactionHandler(parser, presenterJson).Register(api)
+	handler.NewAccountHandler(parser, presenterJson, accountUseCase).Register(api)
+	handler.NewMerchantHandler(parser, presenterJson, merchantUseCase, transactionUseCase).Register(api)
+	handler.NewTransactionHandler(parser, presenterJson, transactionUseCase).Register(api)
 
 	app.Get("/health-check", healthCheck)
 	app.Get("/metrics", monitor.New())
@@ -110,8 +120,8 @@ func setupMiddleware(app *fiber.App, cfg *config.Config) {
 			cors.New(cors.Config{
 				AllowCredentials: true,
 				AllowOrigins:     cfg.AllowedCredentialOrigins,
-				AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
-				AllowMethods:     "GET,POST,PUT,DELETE,PATCH",
+				AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+				AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
 			}),
 		)
 	}
