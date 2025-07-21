@@ -1,4 +1,4 @@
-package mysql_entity
+package entity
 
 type QRType uint8
 
