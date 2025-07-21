@@ -1,0 +1,18 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{url}}/api/v1/categories
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Test Category A",
+    "description": "Lorem Ipsum John Doe Apalah"
+  }
+}

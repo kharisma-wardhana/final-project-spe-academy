@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS accounts (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    merchant_id BIGINT UNSIGNED NOT NULL,
+    client_id VARCHAR(50) NOT NULL,
+    client_secret VARCHAR(100) NOT NULL,
+    private_key TEXT NOT NULL,
+    public_key TEXT NOT NULL,
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (merchant_id) REFERENCES merchants(id) ON DELETE CASCADE
+);

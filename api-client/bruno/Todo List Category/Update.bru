@@ -1,0 +1,22 @@
+meta {
+  name: Update
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{url}}/api/v1/categories/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "name": "Test Category A Updated",
+    "description": "Lorem ipsum updated"
+  }
+}

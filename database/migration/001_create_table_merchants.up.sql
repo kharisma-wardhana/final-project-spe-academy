@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS merchants (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    account_number VARCHAR(50) UNIQUE NOT NULL,
+    mid VARCHAR(50) UNIQUE NOT NULL,
+    nmid VARCHAR(50) UNIQUE NOT NULL,
+    mpan VARCHAR(50) UNIQUE NOT NULL,
+    mcc VARCHAR(5) NOT NULL,
+    postal_code VARCHAR(20),
+    province VARCHAR(100),
+    subdistrict VARCHAR(100),
+    district VARCHAR(100),
+    city VARCHAR(100),
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
