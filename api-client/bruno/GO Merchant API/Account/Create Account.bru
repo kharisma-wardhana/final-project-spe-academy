@@ -1,0 +1,22 @@
+meta {
+  name: Create Account
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{local}}/api/v1/accounts
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "merchant_id": 3,
+    "client_id": "testID",
+    "client_secret": "testSecret",
+    "private_key": "aaa",
+    "public_key": "bbb",
+    "status": "Active"
+  }
+}

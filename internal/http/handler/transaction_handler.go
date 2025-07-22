@@ -1,10 +1,13 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/parser"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/presenter/json"
 	usecase_transaction "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/transaction"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/transaction/entity"
 )
 
 type TransactionHandler struct {
@@ -32,11 +35,29 @@ func (h *TransactionHandler) Register(app fiber.Router) {
 }
 
 func (h *TransactionHandler) GetTransactionByID(c *fiber.Ctx) error {
-	// Implementation for getting a transaction by ID
-	return nil
+	id, err := h.parser.ParserMerchantID(c)
+	if err != nil {
+		return h.presenter.BuildError(c, err)
+	}
+	transaction, err := h.usecase.GetTransactionsByRefID(c.Context(), id)
+	if err != nil {
+		return h.presenter.BuildError(c, err)
+	}
+
+	return h.presenter.BuildSuccess(c, transaction, "Transaction successfully retrieved", http.StatusOK)
 }
 
 func (h *TransactionHandler) CreateTransaction(c *fiber.Ctx) error {
-	// Implementation for creating a new transaction
-	return nil
+	var req entity.TransactionRequest
+	err := h.parser.ParserBodyRequest(c, &req)
+	if err != nil {
+		return h.presenter.BuildError(c, err)
+	}
+
+	transaction, err := h.usecase.CreateTransaction(c.Context(), &req)
+	if err != nil {
+		return h.presenter.BuildError(c, err)
+	}
+
+	return h.presenter.BuildSuccess(c, transaction, "Transaction successfully created", http.StatusCreated)
 }

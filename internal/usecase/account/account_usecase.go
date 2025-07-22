@@ -26,7 +26,7 @@ type IAccountUseCase interface {
 	GetAccountByID(ctx context.Context, id int64) (*entity.AccountResponse, error)
 	GetAccountByMerchantID(ctx context.Context, merchantID int64) (*entity.AccountResponse, error)
 	CreateAccount(ctx context.Context, req *entity.AccountRequest) (*entity.AccountResponse, error)
-	UpdateAccount(ctx context.Context, id int64, req *entity.AccountRequest) (*entity.AccountResponse, error)
+	UpdateAccount(ctx context.Context, id int64, req *entity.AccountRequest) (result *entity.AccountResponse, err error)
 	DeleteAccount(ctx context.Context, id int64) error
 }
 
@@ -79,6 +79,8 @@ func (u *AccountUseCase) CreateAccount(ctx context.Context, req *entity.AccountR
 		MerchantID:   req.MerchantID,
 		ClientID:     req.ClientID,
 		ClientSecret: req.ClientSecret,
+		PrivateKey:   req.PrivateKey,
+		PublicKey:    req.PublicKey,
 		Status:       req.Status,
 	}
 
@@ -94,10 +96,12 @@ func (u *AccountUseCase) CreateAccount(ctx context.Context, req *entity.AccountR
 		ClientID:     accountEntity.ClientID,
 		ClientSecret: accountEntity.ClientSecret,
 		Status:       accountEntity.Status,
+		CreatedAt:    helper.ConvertToJakartaDate(accountEntity.CreatedAt),
+		UpdatedAt:    helper.ConvertToJakartaDate(accountEntity.UpdatedAt),
 	}, nil
 }
 
-func (u *AccountUseCase) UpdateAccount(ctx context.Context, id int64, req *entity.AccountRequest) (*entity.AccountResponse, error) {
+func (u *AccountUseCase) UpdateAccount(ctx context.Context, id int64, req *entity.AccountRequest) (result *entity.AccountResponse, err error) {
 	funcName := "AccountUseCase.UpdateAccount"
 	captureFieldError := generalEntity.CaptureFields{
 		"payload": helper.ToString(req),
@@ -118,6 +122,8 @@ func (u *AccountUseCase) UpdateAccount(ctx context.Context, id int64, req *entit
 			MerchantID:   req.MerchantID,
 			ClientID:     req.ClientID,
 			ClientSecret: req.ClientSecret,
+			PrivateKey:   req.PrivateKey,
+			PublicKey:    req.PublicKey,
 			Status:       req.Status,
 			UpdatedAt:    time.Now(),
 		}
@@ -125,14 +131,22 @@ func (u *AccountUseCase) UpdateAccount(ctx context.Context, id int64, req *entit
 			helper.LogError("accountRepo.Update", funcName, err, captureFieldError, "")
 			return err
 		}
-
+		result = &entity.AccountResponse{
+			ID:           accountEntity.ID,
+			MerchantID:   accountEntity.MerchantID,
+			ClientID:     accountEntity.ClientID,
+			ClientSecret: accountEntity.ClientSecret,
+			Status:       accountEntity.Status,
+			CreatedAt:    helper.ConvertToJakartaDate(accountEntity.CreatedAt),
+			UpdatedAt:    helper.ConvertToJakartaDate(accountEntity.UpdatedAt),
+		}
 		return nil
 	}); err != nil {
 		helper.LogError("accountRepo.DBTransaction", funcName, err, captureFieldError, "")
 		return nil, errwrap.Wrap(err, funcName)
 	}
 
-	return &entity.AccountResponse{}, nil
+	return result, nil
 }
 
 func (u *AccountUseCase) DeleteAccount(ctx context.Context, id int64) error {
