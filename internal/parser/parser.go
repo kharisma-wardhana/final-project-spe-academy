@@ -22,6 +22,10 @@ type WithPathIDAndUserID interface {
 	SetUserID(int64)
 }
 
+type WithMerchantID interface {
+	SetMerchantID(string)
+}
+
 type BodyRequest interface{}
 type QueryParamsRequest interface{}
 
@@ -49,6 +53,9 @@ type Parser interface {
 	ParserBodyWithIntIDPathParamsAndUserID(c *fiber.Ctx, req WithPathIDAndUserID) error
 
 	ParseQueryParams(c *fiber.Ctx, req QueryParamsRequest) error
+
+	// ParserMerchantID extracts the merchant ID from the request context
+	ParserMerchantID(c *fiber.Ctx) (string, error)
 }
 
 type RequestParser struct {
@@ -141,4 +148,15 @@ func (p *RequestParser) ParseQueryParams(c *fiber.Ctx, req QueryParamsRequest) e
 	}
 
 	return nil
+}
+
+// ParserMerchantID extracts the merchant ID from the request context
+func (p *RequestParser) ParserMerchantID(c *fiber.Ctx) (string, error) {
+	merchantID := c.Params("id")
+
+	if merchantID == "" {
+		return "", fmt.Errorf("PATH PARAM ID EMPTY")
+	}
+
+	return merchantID, nil
 }

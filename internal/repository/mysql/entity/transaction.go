@@ -24,3 +24,7 @@ type TransactionEntity struct {
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 }
+
+func (TransactionEntity) TableName() string {
+	return "transactions"
+}

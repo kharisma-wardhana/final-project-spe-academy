@@ -4,20 +4,24 @@ import "time"
 
 type MerchantEntity struct {
 	ID            uint64    `gorm:"primaryKey"`
-	Name          string    `column:"name"`
+	Name          string    `gorm:"column:name"`
 	Phone         string    `gorm:"unique"`
 	Email         string    `gorm:"unique"`
-	AccountNumber string    `column:"account_number"`
-	MID           string    `column:"mid"`
-	NMID          string    `column:"nmid"`
-	MPAN          string    `column:"mpan"`
-	MCC           string    `column:"mcc"`
-	PostalCode    string    `column:"postal_code"`
-	Province      string    `column:"province"`
-	District      string    `column:"district"`
-	SubDistrict   string    `column:"sub_district"`
-	City          string    `column:"city"`
-	Status        string    `column:"status"`
+	AccountNumber string    `gorm:"column:account_number"`
+	MID           string    `gorm:"column:mid"`
+	NMID          string    `gorm:"column:nmid"`
+	MPAN          string    `gorm:"column:mpan"`
+	MCC           string    `gorm:"column:mcc"`
+	PostalCode    string    `gorm:"column:postal_code"`
+	Province      string    `gorm:"column:province"`
+	District      string    `gorm:"column:district"`
+	SubDistrict   string    `gorm:"column:subdistrict"`
+	City          string    `gorm:"column:city"`
+	Status        string    `gorm:"column:status"`
 	CreatedAt     time.Time `gorm:"autoCreateTime"`
 	UpdatedAt     time.Time `gorm:"autoUpdateTime"`
+}
+
+func (MerchantEntity) TableName() string {
+	return "merchants"
 }

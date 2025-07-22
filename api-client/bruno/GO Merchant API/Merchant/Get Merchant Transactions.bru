@@ -1,0 +1,15 @@
+meta {
+  name: Get Merchant Transactions
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{local}}/api/v1/merchants/:mid/transactions
+  body: none
+  auth: inherit
+}
+
+params:path {
+  mid: 1234
+}

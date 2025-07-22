@@ -13,3 +13,7 @@ type AccountEntity struct {
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }
+
+func (AccountEntity) TableName() string {
+	return "accounts"
+}

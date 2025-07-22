@@ -55,6 +55,7 @@ func (u *MerchantUseCase) CreateMerchant(ctx context.Context, req *entity.Mercha
 	}
 
 	return &entity.MerchantResponse{
+		ID:            merchant.ID,
 		Name:          merchant.Name,
 		Phone:         merchant.Phone,
 		Email:         merchant.Email,
@@ -85,6 +86,7 @@ func (u *MerchantUseCase) GetMerchantByMID(ctx context.Context, mid string) (*en
 	}
 
 	return &entity.MerchantResponse{
+		ID:            merchant.ID,
 		Name:          merchant.Name,
 		Phone:         merchant.Phone,
 		Email:         merchant.Email,
@@ -104,7 +106,7 @@ func (u *MerchantUseCase) GetMerchantByMID(ctx context.Context, mid string) (*en
 	}, nil
 }
 
-func (u *MerchantUseCase) UpdateMerchant(ctx context.Context, id int64, req *entity.MerchantRequest) (*entity.MerchantResponse, error) {
+func (u *MerchantUseCase) UpdateMerchant(ctx context.Context, id int64, req *entity.MerchantRequest) (result *entity.MerchantResponse, err error) {
 	funcName := "MerchantUseCase.UpdateMerchant"
 	captureFieldError := generalEntity.CaptureFields{
 		"id":      helper.ToString(id),
@@ -139,12 +141,31 @@ func (u *MerchantUseCase) UpdateMerchant(ctx context.Context, id int64, req *ent
 			helper.LogError("merchantRepo.Update", funcName, err, captureFieldError, "")
 			return err
 		}
+		result = &entity.MerchantResponse{
+			ID:            merchantEntity.ID,
+			Name:          merchantEntity.Name,
+			Phone:         merchantEntity.Phone,
+			Email:         merchantEntity.Email,
+			MID:           merchantEntity.MID,
+			NMID:          merchantEntity.NMID,
+			MPAN:          merchantEntity.MPAN,
+			MCC:           merchantEntity.MCC,
+			AccountNumber: merchantEntity.AccountNumber,
+			PostalCode:    merchantEntity.PostalCode,
+			Province:      merchantEntity.Province,
+			District:      merchantEntity.District,
+			SubDistrict:   merchantEntity.SubDistrict,
+			City:          merchantEntity.City,
+			Status:        merchantEntity.Status,
+			CreatedAt:     helper.ConvertToJakartaDate(merchantEntity.CreatedAt),
+			UpdatedAt:     helper.ConvertToJakartaDate(merchantEntity.UpdatedAt),
+		}
 		return nil
 	}); err != nil {
 		return nil, err
 	}
 
-	return nil, nil
+	return result, nil
 }
 
 func (u *MerchantUseCase) DeleteMerchantByID(ctx context.Context, id int64) error {

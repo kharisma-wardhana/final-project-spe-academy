@@ -12,7 +12,7 @@ type MerchantRequest struct {
 	PostalCode    string `json:"postal_code"`
 	Province      string `json:"province"`
 	District      string `json:"district"`
-	SubDistrict   string `json:"sub_district"`
+	SubDistrict   string `json:"subdistrict"`
 	City          string `json:"city"`
 	Status        string `json:"status"`
 }
@@ -30,7 +30,7 @@ type MerchantResponse struct {
 	PostalCode    string `json:"postal_code"`
 	Province      string `json:"province"`
 	District      string `json:"district"`
-	SubDistrict   string `json:"sub_district"`
+	SubDistrict   string `json:"subdistrict"`
 	City          string `json:"city"`
 	Status        string `json:"status"`
 	CreatedAt     string `json:"created_at"`

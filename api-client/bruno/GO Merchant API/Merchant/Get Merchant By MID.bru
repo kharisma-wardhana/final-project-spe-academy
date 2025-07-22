@@ -1,0 +1,15 @@
+meta {
+  name: Get Merchant By MID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{local}}/api/v1/merchants/:mid
+  body: none
+  auth: inherit
+}
+
+params:path {
+  mid: 1234
+}

@@ -15,9 +15,9 @@ type IMerchantRepository interface {
 	TrxSupportRepo
 	FindByID(ctx context.Context, id int64) (*entity.MerchantEntity, error)
 	FindByMID(ctx context.Context, mid string) (*entity.MerchantEntity, error)
-	LockByID(ctx context.Context, dbTrx TrxObj, id int64) (*entity.MerchantEntity, error)
+	LockByID(ctx context.Context, dbTrx TrxObj, id int64) (result *entity.MerchantEntity, err error)
 	Create(ctx context.Context, dbTrx TrxObj, params *entity.MerchantEntity, nonZeroVal bool) error
-	Update(ctx context.Context, dbTrx TrxObj, params *entity.MerchantEntity, changes *entity.MerchantEntity) error
+	Update(ctx context.Context, dbTrx TrxObj, params *entity.MerchantEntity, changes *entity.MerchantEntity) (err error)
 	DeleteByID(ctx context.Context, dbTrx TrxObj, id int64) error
 }
 
@@ -38,8 +38,11 @@ func (r *MerchantRepository) FindByID(ctx context.Context, id int64) (*entity.Me
 	var merchant entity.MerchantEntity
 	if err := r.db.
 		Raw("SELECT * FROM merchants WHERE id = ?", id).
-		Scan(&merchant).
+		First(&merchant).
 		Error; err != nil {
+		if errwrap.Is(err, gorm.ErrRecordNotFound) {
+			return nil, appErr.ErrRecordNotFound()
+		}
 		return nil, err
 	}
 	return &merchant, nil
@@ -54,31 +57,33 @@ func (r *MerchantRepository) FindByMID(ctx context.Context, mid string) (*entity
 	var merchant entity.MerchantEntity
 	if err := r.db.
 		Raw("SELECT * FROM merchants WHERE mid = ?", mid).
-		Scan(&merchant).
+		First(&merchant).
 		Error; err != nil {
+
+		if errwrap.Is(err, gorm.ErrRecordNotFound) {
+			return nil, appErr.ErrRecordNotFound()
+		}
+
 		return nil, err
 	}
 	return &merchant, nil
 }
 
-func (r *MerchantRepository) LockByID(ctx context.Context, dbTrx TrxObj, id int64) (*entity.MerchantEntity, error) {
+func (r *MerchantRepository) LockByID(ctx context.Context, dbTrx TrxObj, id int64) (result *entity.MerchantEntity, err error) {
 	funcName := "MerchantRepository.LockByID"
 	if err := helper.CheckDeadline(ctx); err != nil {
 		return nil, errwrap.Wrap(err, funcName)
 	}
 
-	var merchant entity.MerchantEntity
-	err := r.Trx(dbTrx).
+	err = r.Trx(dbTrx).
 		Raw("SELECT * FROM merchants WHERE id = ? FOR UPDATE", id).
-		Scan(&merchant).Error
+		Scan(&result).Error
 
 	if errwrap.Is(err, gorm.ErrRecordNotFound) {
 		return nil, appErr.ErrRecordNotFound()
-	} else if err != nil {
-		return nil, errwrap.Wrap(err, funcName)
 	}
 
-	return &merchant, nil
+	return result, err
 }
 
 func (r *MerchantRepository) Create(ctx context.Context, dbTrx TrxObj, params *entity.MerchantEntity, nonZeroVal bool) error {
@@ -91,15 +96,23 @@ func (r *MerchantRepository) Create(ctx context.Context, dbTrx TrxObj, params *e
 	return r.Trx(dbTrx).Select(cols).Create(&params).Error
 }
 
-func (r *MerchantRepository) Update(ctx context.Context, dbTrx TrxObj, params *entity.MerchantEntity, changes *entity.MerchantEntity) error {
+func (r *MerchantRepository) Update(ctx context.Context, dbTrx TrxObj, params *entity.MerchantEntity, changes *entity.MerchantEntity) (err error) {
 	funcName := "MerchantRepository.Update"
 	if err := helper.CheckDeadline(ctx); err != nil {
 		return errwrap.Wrap(err, funcName)
 	}
 
-	if err := r.db.WithContext(ctx).Model(params).Updates(changes).Error; err != nil {
-		return err
+	db := r.Trx(dbTrx).Model(params)
+	if changes != nil {
+		err = db.Updates(*changes).Error
+	} else {
+		err = db.Updates(helper.StructToMap(params, false)).Error
 	}
+
+	if err != nil {
+		return errwrap.Wrap(err, funcName)
+	}
+
 	return nil
 }
 

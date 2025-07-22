@@ -1,0 +1,34 @@
+meta {
+  name: Update Merchant
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{local}}/api/v1/merchants/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "name": "testMerchant",
+    "phone": "0811111111",
+    "email": "test@email.com",
+    "account_number": "098901920",
+    "mid": "1234",
+    "nmid": "ID1234",
+    "mpan": "9013290200",
+    "mcc": "411",
+    "postal_code": "55142",
+    "province": "Yogyakarta",
+    "district": "Gedongkiwo",
+    "subdistrict": "Mantrijeron",
+    "city": "Yogyakarta",
+    "status": "Active"
+  }
+}

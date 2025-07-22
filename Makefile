@@ -8,16 +8,16 @@ migrate:
 	migrate create -ext sql -dir database/migration/ -seq $(create)
 
 migrate_up:
-	migrate -path database/migration -database '$(MYSQL_URI)' -verbose up
+	migrate -path database/migration -database 'mysql://$(MYSQL_URI)' -verbose up
 
 migrate_down:
-	migrate -path database/migration -database '$(MYSQL_URI)' -verbose down
+	migrate -path database/migration -database 'mysql://$(MYSQL_URI)' -verbose down
 
 migrate_rollback:
-	migrate -path database/migration -database '$(MYSQL_URI)' -verbose down $(shell echo ${step}-1 | bc)
+	migrate -path database/migration -database 'mysql://$(MYSQL_URI)' -verbose down $(shell echo ${step}-1 | bc)
 
 migrate_fix: 
-	migrate -path database/migration -database '$(MYSQL_URI)' force $(version)
+	migrate -path database/migration -database 'mysql://$(MYSQL_URI)' force $(version)
 
 test:
 	go test -cover -coverprofile=coverage.out $$(go list ./...)

@@ -38,8 +38,11 @@ func (r *AccountRepository) FindByID(ctx context.Context, id int64) (*entity.Acc
 	var account entity.AccountEntity
 	if err := r.db.
 		Raw("SELECT * FROM accounts WHERE id = ?", id).
-		Scan(&account).
+		First(&account).
 		Error; err != nil {
+		if errwrap.Is(err, gorm.ErrRecordNotFound) {
+			return nil, appErr.ErrRecordNotFound()
+		}
 		return nil, err
 	}
 	return &account, nil
@@ -115,7 +118,7 @@ func (r *AccountRepository) LockByID(ctx context.Context, dbTrx TrxObj, id int64
 	var account entity.AccountEntity
 	err := r.Trx(dbTrx).
 		Raw("SELECT * FROM accounts WHERE id = ? FOR UPDATE", id).
-		Scan(&account).Error
+		First(&account).Error
 
 	if errwrap.Is(err, gorm.ErrRecordNotFound) {
 		return nil, appErr.ErrRecordNotFound()
