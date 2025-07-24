@@ -11,17 +11,23 @@ import (
 	mEntity "github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql/entity"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/redis"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase"
+	usecase_log "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/log"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/transaction/entity"
 	errWrap "github.com/pkg/errors"
 )
 
 type TransactionUseCase struct {
+	logUseCase      usecase_log.ILogUseCase
 	transactionRepo mysql.ITransactionRepository
 	qrRepo          redis.IQRRepository
 }
 
-func NewTransactionUseCase(transactionRepo mysql.ITransactionRepository, qrRepo redis.IQRRepository) *TransactionUseCase {
-	return &TransactionUseCase{transactionRepo, qrRepo}
+func NewTransactionUseCase(logUseCase usecase_log.ILogUseCase, transactionRepo mysql.ITransactionRepository, qrRepo redis.IQRRepository) *TransactionUseCase {
+	return &TransactionUseCase{
+		logUseCase:      logUseCase,
+		transactionRepo: transactionRepo,
+		qrRepo:          qrRepo,
+	}
 }
 
 type ITransactionUseCase interface {
@@ -37,24 +43,25 @@ func (u *TransactionUseCase) CreateTransaction(ctx context.Context, req *entity.
 	}
 
 	if err := usecase.ValidateStruct(*req); err != "" {
+		u.logUseCase.Error("usecase.ValidateStruct", funcName, fmt.Errorf("%s", err), captureFieldError)
 		return nil, errWrap.Wrap(fmt.Errorf(generalEntity.INVALID_PAYLOAD_CODE), err)
 	}
 
 	if req.Amount <= 0 || req.FeeAmount < 0 || req.TotalAmount <= 0 {
 		err := fmt.Errorf("invalid request parameters: %v", captureFieldError)
-		helper.LogError("transactionRepo.CreateTransaction", funcName, err, captureFieldError, "")
+		u.logUseCase.Error("transactionRepo.CreateTransaction", funcName, err, captureFieldError)
 		return nil, err
 	}
 
 	qr, err := u.qrRepo.GetByBillingID(ctx, req.BillingID)
 	if err != nil {
-		helper.LogError("qrRepo.GetByBillingID", funcName, err, captureFieldError, "")
+		u.logUseCase.Error("qrRepo.GetByBillingID", funcName, err, captureFieldError)
 		return nil, err
 	}
 
 	if qr == nil {
 		err := fmt.Errorf("QR code not found for billing ID: %s", req.BillingID)
-		helper.LogError("qrRepo.GetByBillingID", funcName, err, captureFieldError, "")
+		u.logUseCase.Error("qrRepo.GetByBillingID", funcName, err, captureFieldError)
 		return nil, err
 	}
 
@@ -105,7 +112,7 @@ func (u *TransactionUseCase) GetTransactionsByMerchantID(ctx context.Context, me
 
 	transactions, err := u.transactionRepo.FindByMerchantID(ctx, merchantID)
 	if err != nil {
-		helper.LogError("transactionRepo.FindByMerchantID", funcName, err, captureFieldError, "")
+		u.logUseCase.Error("transactionRepo.FindByMerchantID", funcName, err, captureFieldError)
 		return nil, err
 	}
 
@@ -137,7 +144,7 @@ func (u *TransactionUseCase) GetTransactionsByRefID(ctx context.Context, refID s
 
 	transaction, err := u.transactionRepo.FindByRefID(ctx, refID)
 	if err != nil {
-		helper.LogError("transactionRepo.FindByRefID", funcName, err, captureFieldError, "")
+		u.logUseCase.Error("transactionRepo.FindByRefID", funcName, err, captureFieldError)
 		return nil, err
 	}
 

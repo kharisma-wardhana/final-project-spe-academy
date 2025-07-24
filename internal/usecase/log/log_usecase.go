@@ -11,20 +11,20 @@ import (
 	"go.uber.org/zap"
 )
 
-// LogUsecase is a usecase for writing log to Queue (Message Broker)
+// LogUseCase is a usecase for writing log to Queue (Message Broker)
 type Log struct {
 	queue     queue.Queue
 	zapLogger *zap.Logger
 }
 
-func NewLogUsecase(
+func NewLogUseCase(
 	queue queue.Queue,
 	zapLogger *zap.Logger,
 ) *Log {
 	return &Log{queue, zapLogger}
 }
 
-type LogUsecase interface {
+type ILogUseCase interface {
 	Log(status entity.LogType, message string, funcName string, err error, logFields map[string]string, processName string)
 	Error(process string, funcName string, err error, logFields map[string]string)
 	Info(message string, funcName string, logFields map[string]string, processName string)
@@ -63,7 +63,7 @@ func (w *Log) Log(status entity.LogType, message string, funcName string, err er
 	}
 
 	// If error when publish to queue, write log to file
-	if errQueue != nil || (helper.GetAppEnv() != entity.PRODUCTION_ENV && os.Getenv("DEBUG_MODE") == "true") {
+	if errQueue != nil || (os.Getenv("ENABLE_ASYNC_LOGGING") == "false" && os.Getenv("DEBUG_MODE") == "true") {
 		switch status {
 		case entity.LogError:
 			logger.Error(message, fields...)

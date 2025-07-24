@@ -17,7 +17,7 @@ import (
 type LogUsecaseTestSuite struct {
 	suite.Suite
 
-	usecase   usecase_log.LogUsecase
+	usecase   usecase_log.ILogUseCase
 	queue     *mocks.Queue
 	zapLogger *zap.Logger
 }
@@ -26,7 +26,7 @@ func (s *LogUsecaseTestSuite) SetupTest() {
 	s.queue = &mocks.Queue{}
 	s.zapLogger, _ = config.NewZapLog("dev")
 
-	s.usecase = usecase_log.NewLogUsecase(s.queue, s.zapLogger)
+	s.usecase = usecase_log.NewLogUseCase(s.queue, s.zapLogger)
 }
 
 func TestLogUsecase(t *testing.T) {

@@ -125,7 +125,7 @@ func (c *RabbitMQ) HandleConsumedDeliveries(key string, handle func(payload map[
 	for {
 		go handler(*c, key, delivery, handle)
 		if err := <-c.Err; err != nil {
-			fmt.Println(fmt.Sprintf("[CONSUMER] RabbitMQ connection closed: %s", err.Error()))
+			fmt.Printf("[CONSUMER] RabbitMQ connection closed: %s\n", err.Error())
 
 			c.Reconnect()
 			deliveries, err := c.consume(key)
@@ -140,14 +140,14 @@ func (c *RabbitMQ) HandleConsumedDeliveries(key string, handle func(payload map[
 // Publisher Things
 func (c *RabbitMQ) Publish(key string, message []byte, attempts int32) error {
 	if attempts > int32(c.RetryCount) {
-		fmt.Println(fmt.Sprintf("[PUBLISHER] Too many attempts: %s", key))
+		fmt.Printf("[PUBLISHER] Too many attempts: %s\n", key)
 		return nil
 	}
 
 	select {
 	case err := <-c.Err:
 		if err != nil {
-			fmt.Println(fmt.Sprintf("[PUBLISHER] RabbitMQ connection closed: %s", err.Error()))
+			fmt.Printf("[PUBLISHER] RabbitMQ connection closed: %s\n", err.Error())
 			c.Reconnect()
 		}
 	default:
@@ -161,22 +161,22 @@ func (c *RabbitMQ) Publish(key string, message []byte, attempts int32) error {
 		},
 	}
 
-	fmt.Println(fmt.Sprintf("[PUBLISHER] Publishing message: %s - %d", key, attempts))
+	fmt.Printf("[PUBLISHER] Publishing message: %s - %d\n", key, attempts)
 
 	if err := c.channel.PublishWithContext(c.Ctx, c.Exchange, key, false, false, p); err != nil {
-		fmt.Println(fmt.Sprintf("[PUBLISHER] Error in publishing message: %s", err.Error()))
+		fmt.Printf("[PUBLISHER] Error in publishing message: %s\n", err.Error())
 
 		c.Reconnect()
 		return c.Publish(key, message, attempts+1)
 	}
 
-	fmt.Println(fmt.Sprintf("[PUBLISHER] Published message: %s - %d", key, attempts))
+	fmt.Printf("[PUBLISHER] Published message: %s - %d\n", key, attempts)
 	return nil
 }
 
 func handler(c RabbitMQ, key string, messages <-chan amqp.Delivery, handle func(payload map[string]interface{}) error) {
 	for message := range messages {
-		fmt.Println(fmt.Sprintf("[*] Received message: %s", key))
+		fmt.Printf("[*] Received message: %s\n", key)
 		attempts := int32(1)
 
 		if message.Headers["x-attempts"] != nil {
@@ -194,7 +194,7 @@ func handler(c RabbitMQ, key string, messages <-chan amqp.Delivery, handle func(
 			if attempts < int32(c.RetryCount) {
 				c.Publish(key, message.Body, attempts+int32(1))
 			} else {
-				fmt.Println(fmt.Sprintf("Too many attempts: %s", key))
+				fmt.Printf("Too many attempts: %s\n", key)
 			}
 		}
 	}

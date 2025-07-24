@@ -9,17 +9,26 @@ import (
 
 	generalEntity "github.com/kharisma-wardhana/final-project-spe-academy/entity"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/helper"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql"
+	mEntity "github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql/entity"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/redis"
 	rEntity "github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/redis/entity"
+	usecase_log "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/log"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/qr/entity"
 )
 
 type QRUseCase struct {
-	qrRepo *redis.QRRepository
+	logUseCase   usecase_log.ILogUseCase
+	qrRepo       redis.IQRRepository
+	merchantRepo mysql.IMerchantRepository
 }
 
-func NewQRUseCase(qrRepo *redis.QRRepository) *QRUseCase {
-	return &QRUseCase{qrRepo}
+func NewQRUseCase(logUseCase usecase_log.ILogUseCase, qrRepo redis.IQRRepository, merchantRepo mysql.IMerchantRepository) *QRUseCase {
+	return &QRUseCase{
+		logUseCase:   logUseCase,
+		qrRepo:       qrRepo,
+		merchantRepo: merchantRepo,
+	}
 }
 
 type IQRUseCase interface {
@@ -36,7 +45,7 @@ func (u *QRUseCase) GenerateQR(ctx context.Context, request entity.QRRequest) (*
 
 	if request.Amount <= 0 || request.Expiration <= 0 {
 		err := fmt.Errorf("invalid request parameters: %v", captureFieldError)
-		helper.LogError("qrRepo.GenerateQR", funcName, err, captureFieldError, "")
+		u.logUseCase.Error("QRUseCase.GenerateQR", funcName, err, captureFieldError)
 		return nil, err
 	}
 
@@ -44,9 +53,14 @@ func (u *QRUseCase) GenerateQR(ctx context.Context, request entity.QRRequest) (*
 	billingID := fmt.Sprintf("ST-%d", generateRandomID())
 
 	// Generate QR code payload
-	qrCode := generateQRISPayload()
+	merchant, err := u.merchantRepo.FindByID(ctx, request.MerchantID)
+	if err != nil {
+		u.logUseCase.Error("merchantRepo.FindByID", funcName, err, captureFieldError)
+		return nil, err
+	}
+	qrCode := generateQRISPayload(merchant, request)
 
-	err := u.qrRepo.Create(ctx, &rEntity.QREntity{
+	err = u.qrRepo.Create(ctx, &rEntity.QREntity{
 		MerchantID: request.MerchantID,
 		BillingID:  billingID,
 		Amount:     request.Amount,
@@ -54,7 +68,7 @@ func (u *QRUseCase) GenerateQR(ctx context.Context, request entity.QRRequest) (*
 		Expiration: request.Expiration,
 	})
 	if err != nil {
-		helper.LogError("qrRepo.SaveQR", funcName, err, captureFieldError, "")
+		u.logUseCase.Error("qrRepo.Create", funcName, err, captureFieldError)
 		return nil, err
 	}
 
@@ -76,7 +90,7 @@ func (u *QRUseCase) ValidateQR(ctx context.Context, billingID string) (bool, err
 
 	_, err := u.qrRepo.GetByBillingID(ctx, billingID)
 	if err != nil {
-		helper.LogError("qrRepo.GetByBillingID", "QRUseCase.ValidateQR", err, generalEntity.CaptureFields{"billingID": billingID}, "")
+		u.logUseCase.Error("qrRepo.GetByBillingID", "QRUseCase.ValidateQR", err, generalEntity.CaptureFields{"billingID": billingID})
 		return false, err
 	}
 
@@ -92,19 +106,21 @@ func formatTag(tag, value string) string {
 	return fmt.Sprintf("%s%02d%s", tag, len(value), value)
 }
 
-func generateQRISPayload() string {
+func generateQRISPayload(merchant *mEntity.MerchantEntity, request entity.QRRequest) string {
 	var payload strings.Builder
 
 	// Format standar QRIS static (contoh merchant statis tanpa acquirer spesifik)
-	payload.WriteString(formatTag("00", "01"))       // Payload Format Indicator
-	payload.WriteString(formatTag("01", "11"))       // Point of Initiation Method (11 = Static)
-	payload.WriteString(formatTag("52", "0000"))     // Merchant Category Code
-	payload.WriteString(formatTag("53", "360"))      // Transaction Currency (360 = IDR)
-	payload.WriteString(formatTag("54", "1000"))     // Transaction Amount (optional, here Rp10.00)
-	payload.WriteString(formatTag("58", "ID"))       // Country Code
-	payload.WriteString(formatTag("59", "TOKO ABC")) // Merchant Name
-	payload.WriteString(formatTag("60", "JAKARTA"))  // Merchant City
+	payload.WriteString(formatTag("00", "01"))                                // Payload Format Indicator
+	payload.WriteString(formatTag("01", "11"))                                // Point of Initiation Method (11 = Static)
+	payload.WriteString(formatTag("52", merchant.MCC))                        // Merchant Category Code
+	payload.WriteString(formatTag("53", request.Currency))                    // Transaction Currency (360 = IDR)
+	payload.WriteString(formatTag("54", fmt.Sprintf("%.2f", request.Amount))) // Transaction Amount (optional, here Rp10.00)
+	payload.WriteString(formatTag("58", "ID"))                                // Country Code
+	payload.WriteString(formatTag("59", merchant.Name))                       // Merchant Name
+	payload.WriteString(formatTag("60", merchant.City))                       // Merchant City
+	payload.WriteString(formatTag("61", "01"))                                // Transaction Type (01 = Payment)
 	// Tag 62 = Additional Data, optional
+	payload.WriteString(formatTag("62", fmt.Sprintf("01%02d%s", len(merchant.MID), merchant.MID))) // Merchant ID
 
 	// Append CRC placeholder
 	data := payload.String()

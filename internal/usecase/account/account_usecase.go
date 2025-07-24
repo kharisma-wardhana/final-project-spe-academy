@@ -11,16 +11,21 @@ import (
 	mEntity "github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql/entity"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/account/entity"
+	usecase_log "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/log"
 	errWrap "github.com/pkg/errors"
 )
 
 type AccountUseCase struct {
 	// Add any dependencies needed for the use case here
+	logUseCase  usecase_log.ILogUseCase
 	accountRepo mysql.IAccountRepository
 }
 
-func NewAccountUseCase(accountRepo mysql.IAccountRepository) *AccountUseCase {
-	return &AccountUseCase{accountRepo}
+func NewAccountUseCase(logUseCase usecase_log.ILogUseCase, accountRepo mysql.IAccountRepository) *AccountUseCase {
+	return &AccountUseCase{
+		logUseCase:  logUseCase,
+		accountRepo: accountRepo,
+	}
 }
 
 type IAccountUseCase interface {
@@ -37,7 +42,7 @@ func (u *AccountUseCase) GetAccountByID(ctx context.Context, id int64) (*entity.
 
 	account, err := u.accountRepo.FindByID(ctx, id)
 	if err != nil {
-		helper.LogError("accountRepo.FindByID", funcName, err, captureFieldError, "")
+		u.logUseCase.Error("accountRepo.FindByID", funcName, err, captureFieldError)
 		return nil, err
 	}
 
@@ -62,7 +67,7 @@ func (u *AccountUseCase) GetAccountByMerchantID(ctx context.Context, merchantID 
 
 	account, err := u.accountRepo.FindByMerchantID(ctx, merchantID)
 	if err != nil {
-		helper.LogError("accountRepo.FindByMerchantID", funcName, err, captureFieldError, "")
+		u.logUseCase.Error("accountRepo.FindByMerchantID", funcName, err, captureFieldError)
 		return nil, err
 	}
 
@@ -85,6 +90,7 @@ func (u *AccountUseCase) CreateAccount(ctx context.Context, req *entity.AccountR
 		"payload": helper.ToString(req),
 	}
 	if err := usecase.ValidateStruct(*req); err != "" {
+		u.logUseCase.Error("usecase.ValidateStruct", funcName, fmt.Errorf("%s", err), captureFieldError)
 		return nil, errWrap.Wrap(fmt.Errorf(generalEntity.INVALID_PAYLOAD_CODE), err)
 	}
 	var accountEntity = &mEntity.AccountEntity{
@@ -98,7 +104,7 @@ func (u *AccountUseCase) CreateAccount(ctx context.Context, req *entity.AccountR
 
 	err := u.accountRepo.Create(ctx, nil, accountEntity, true)
 	if err != nil {
-		helper.LogError("accountRepo.Create", funcName, err, captureFieldError, "")
+		u.logUseCase.Error("accountRepo.Create", funcName, err, captureFieldError)
 		return nil, err
 	}
 
@@ -121,17 +127,20 @@ func (u *AccountUseCase) UpdateAccount(ctx context.Context, id int64, req *entit
 		"payload": helper.ToString(req),
 	}
 	if err := usecase.ValidateStruct(*req); err != "" {
+		u.logUseCase.Error("usecase.ValidateStruct", funcName, fmt.Errorf("%s", err), captureFieldError)
 		return nil, errWrap.Wrap(fmt.Errorf(generalEntity.INVALID_PAYLOAD_CODE), err)
 	}
 
 	if err := mysql.DBTransaction(u.accountRepo, func(dbTrx mysql.TrxObj) error {
 		accountEntity, err := u.accountRepo.LockByID(ctx, dbTrx, id)
 		if err != nil {
-			helper.LogError("accountRepo.LockByID", funcName, err, captureFieldError, "")
+			u.logUseCase.Error("accountRepo.LockByID", funcName, err, captureFieldError)
 			return err
 		}
 		if accountEntity == nil {
-			return fmt.Errorf("account with id %d not found", id)
+			err := fmt.Errorf("account with id %d not found", id)
+			u.logUseCase.Error("accountRepo.LockByID", funcName, err, captureFieldError)
+			return err
 		}
 
 		// Process the changes
@@ -145,7 +154,7 @@ func (u *AccountUseCase) UpdateAccount(ctx context.Context, id int64, req *entit
 			UpdatedAt:    time.Now(),
 		}
 		if err := u.accountRepo.Update(ctx, dbTrx, accountEntity, changes); err != nil {
-			helper.LogError("accountRepo.Update", funcName, err, captureFieldError, "")
+			u.logUseCase.Error("accountRepo.Update", funcName, err, captureFieldError)
 			return err
 		}
 		result = &entity.AccountResponse{
@@ -159,7 +168,7 @@ func (u *AccountUseCase) UpdateAccount(ctx context.Context, id int64, req *entit
 		}
 		return nil
 	}); err != nil {
-		helper.LogError("accountRepo.DBTransaction", funcName, err, captureFieldError, "")
+		u.logUseCase.Error("accountRepo.DBTransaction", funcName, err, captureFieldError)
 		return nil, errWrap.Wrap(err, funcName)
 	}
 
@@ -173,7 +182,7 @@ func (u *AccountUseCase) DeleteAccount(ctx context.Context, id int64) error {
 	}
 
 	if err := u.accountRepo.DeleteByID(ctx, nil, id); err != nil {
-		helper.LogError("accountRepo.DeleteByID", funcName, err, captureFieldError, "")
+		u.logUseCase.Error("accountRepo.DeleteByID", funcName, err, captureFieldError)
 		return err
 	}
 	return nil

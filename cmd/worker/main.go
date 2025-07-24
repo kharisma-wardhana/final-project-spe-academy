@@ -45,12 +45,6 @@ func main() {
 	}
 	defer app.mongoDB.Client().Disconnect(app.ctx)
 
-	// gormLogger := config.NewGormLogConfig(&cfg.MysqlOption)
-	// mysqlDB, err := config.NewMysql(cfg.AppEnv, &cfg.MysqlOption, gormLogger)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
 	app.queue, err = config.NewRabbitMQInstance(app.ctx, &cfg.RabbitMQOption)
 	if err != nil {
 		log.Fatal(err)
@@ -61,7 +55,6 @@ func main() {
 
 	// Consumer
 	logConsumer := consumer.NewLogConsumer(context.Background(), logMongoRepo)
-	exampleConsumer := consumer.NewExampleConsumer(context.Background(), logMongoRepo)
 
 	var interrupt = make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
@@ -70,9 +63,6 @@ func main() {
 	case queue.ProcessSyncLog:
 		log.Printf("[Worker] Listening to %v", queue.ProcessSyncLog)
 		go app.queue.HandleConsumedDeliveries(queue.ProcessSyncLog, logConsumer.ProcessSyncLog)
-	case queue.ProcessExample:
-		log.Printf("[Worker] Listening to %v", queue.ProcessExample)
-		go app.queue.HandleConsumedDeliveries(queue.ProcessExample, exampleConsumer.Process)
 	default:
 		log.Fatalf("[Worker] topic not found : %v", os.Args[1])
 	}

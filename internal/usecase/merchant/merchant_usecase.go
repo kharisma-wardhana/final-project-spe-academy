@@ -10,17 +10,20 @@ import (
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql"
 	mEntity "github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql/entity"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase"
+	usecase_log "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/log"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/merchant/entity"
 	errWrap "github.com/pkg/errors"
 )
 
 type MerchantUseCase struct {
+	logUseCase   usecase_log.ILogUseCase
 	merchantRepo mysql.IMerchantRepository
 }
 
-func NewMerchantUseCase(merchantRepo mysql.IMerchantRepository) *MerchantUseCase {
+func NewMerchantUseCase(logUseCase usecase_log.ILogUseCase, merchantRepo mysql.IMerchantRepository) *MerchantUseCase {
 	return &MerchantUseCase{
-		merchantRepo,
+		logUseCase:   logUseCase,
+		merchantRepo: merchantRepo,
 	}
 }
 
@@ -37,6 +40,7 @@ func (u *MerchantUseCase) CreateMerchant(ctx context.Context, req *entity.Mercha
 		"payload": helper.ToString(req),
 	}
 	if err := usecase.ValidateStruct(*req); err != "" {
+		u.logUseCase.Error("usecase.ValidateStruct", funcName, fmt.Errorf("%s", err), captureFieldError)
 		return nil, errWrap.Wrap(fmt.Errorf(generalEntity.INVALID_PAYLOAD_CODE), err)
 	}
 	merchant := &mEntity.MerchantEntity{
@@ -56,7 +60,7 @@ func (u *MerchantUseCase) CreateMerchant(ctx context.Context, req *entity.Mercha
 		Status:        req.Status,
 	}
 	if err := u.merchantRepo.Create(ctx, nil, merchant, true); err != nil {
-		helper.LogError("merchantRepo.Create", funcName, err, captureFieldError, "")
+		u.logUseCase.Error("merchantRepo.Create", funcName, err, captureFieldError)
 		return nil, err
 	}
 
@@ -87,7 +91,7 @@ func (u *MerchantUseCase) GetMerchantByMID(ctx context.Context, mid string) (*en
 
 	merchant, err := u.merchantRepo.FindByMID(ctx, mid)
 	if err != nil {
-		helper.LogError("merchantRepo.FindByMID", funcName, err, captureFieldError, "")
+		u.logUseCase.Error("merchantRepo.FindByMID", funcName, err, captureFieldError)
 		return nil, err
 	}
 
@@ -119,13 +123,14 @@ func (u *MerchantUseCase) UpdateMerchant(ctx context.Context, id int64, req *ent
 		"payload": helper.ToString(req),
 	}
 	if err := usecase.ValidateStruct(*req); err != "" {
+		u.logUseCase.Error("usecase.ValidateStruct", funcName, fmt.Errorf("%s", err), captureFieldError)
 		return nil, errWrap.Wrap(fmt.Errorf(generalEntity.INVALID_PAYLOAD_CODE), err)
 	}
 
 	if err := mysql.DBTransaction(u.merchantRepo, func(dbTrx mysql.TrxObj) error {
 		merchantEntity, err := u.merchantRepo.LockByID(ctx, dbTrx, id)
 		if err != nil {
-			helper.LogError("merchantRepo.LockByID", funcName, err, captureFieldError, "")
+			u.logUseCase.Error("merchantRepo.LockByID", funcName, err, captureFieldError)
 			return err
 		}
 		changes := &mEntity.MerchantEntity{
@@ -147,7 +152,7 @@ func (u *MerchantUseCase) UpdateMerchant(ctx context.Context, id int64, req *ent
 		}
 		err = u.merchantRepo.Update(ctx, dbTrx, merchantEntity, changes)
 		if err != nil {
-			helper.LogError("merchantRepo.Update", funcName, err, captureFieldError, "")
+			u.logUseCase.Error("merchantRepo.Update", funcName, err, captureFieldError)
 			return err
 		}
 		result = &entity.MerchantResponse{
@@ -182,7 +187,7 @@ func (u *MerchantUseCase) DeleteMerchantByID(ctx context.Context, id int64) erro
 	captureFieldError := generalEntity.CaptureFields{"id": helper.ToString(id)}
 
 	if err := u.merchantRepo.DeleteByID(ctx, nil, id); err != nil {
-		helper.LogError("merchantRepo.DeleteByID", funcName, err, captureFieldError, "")
+		u.logUseCase.Error("merchantRepo.DeleteByID", funcName, err, captureFieldError)
 		return err
 	}
 

@@ -16,6 +16,7 @@ type Config struct {
 	AllowedCredentialOrigins []string `env:"ALLOWED_CREDENTIAL_ORIGINS"`
 	MiddlewareAddress        string   `env:"MIDDLEWARE_ADDR"`
 	JwtExpireDaysCount       int      `env:"JWT_EXPIRE_DAYS_COUNT"`
+	EnableAsyncLogging       bool     `env:"ENABLE_ASYNC_LOGGING,default=false"`
 	MysqlOption
 	RabbitMQOption
 	MongodbOption

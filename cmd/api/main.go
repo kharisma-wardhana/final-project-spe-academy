@@ -64,7 +64,11 @@ func main() {
 	// Middleware setup
 	setupMiddleware(app, cfg)
 
-	logger, _ := config.NewZapLog(cfg.AppEnv)
+	logger, err := config.NewZapLog(cfg.AppEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	logger = logger.WithOptions(zap.AddCallerSkip(1))
 
 	presenterJson := json.NewJsonPresenter()
@@ -95,11 +99,11 @@ func main() {
 	qrRepo := redis.NewQRRepository(redisDB)
 
 	// USECASE : Write bussines logic code here (validation, business logic, etc.)
-	_ = usecase_log.NewLogUsecase(queue, logger)
-	accountUseCase := usecase_account.NewAccountUseCase(accountRepo)
-	merchantUseCase := usecase_merchant.NewMerchantUseCase(merchantRepo)
-	transactionUseCase := usecase_transaction.NewTransactionUseCase(transactionRepo, qrRepo)
-	qrUseCase := usecase_qr.NewQRUseCase(qrRepo)
+	logUseCase := usecase_log.NewLogUseCase(queue, logger)
+	accountUseCase := usecase_account.NewAccountUseCase(logUseCase, accountRepo)
+	merchantUseCase := usecase_merchant.NewMerchantUseCase(logUseCase, merchantRepo)
+	transactionUseCase := usecase_transaction.NewTransactionUseCase(logUseCase, transactionRepo, qrRepo)
+	qrUseCase := usecase_qr.NewQRUseCase(logUseCase, qrRepo, merchantRepo)
 
 	api := app.Group("/api/v1")
 
