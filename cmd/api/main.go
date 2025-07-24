@@ -98,7 +98,7 @@ func main() {
 	_ = usecase_log.NewLogUsecase(queue, logger)
 	accountUseCase := usecase_account.NewAccountUseCase(accountRepo)
 	merchantUseCase := usecase_merchant.NewMerchantUseCase(merchantRepo)
-	transactionUseCase := usecase_transaction.NewTransactionUseCase(transactionRepo)
+	transactionUseCase := usecase_transaction.NewTransactionUseCase(transactionRepo, qrRepo)
 	qrUseCase := usecase_qr.NewQRUseCase(qrRepo)
 
 	api := app.Group("/api/v1")

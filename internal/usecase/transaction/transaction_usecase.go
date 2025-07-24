@@ -2,21 +2,24 @@ package usecase_transaction
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	generalEntity "github.com/kharisma-wardhana/final-project-spe-academy/entity"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/helper"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql"
 	mEntity "github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql/entity"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/redis"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/transaction/entity"
 )
 
 type TransactionUseCase struct {
 	transactionRepo mysql.ITransactionRepository
+	qrRepo          redis.IQRRepository
 }
 
-func NewTransactionUseCase(transactionRepo mysql.ITransactionRepository) *TransactionUseCase {
-	return &TransactionUseCase{transactionRepo}
+func NewTransactionUseCase(transactionRepo mysql.ITransactionRepository, qrRepo redis.IQRRepository) *TransactionUseCase {
+	return &TransactionUseCase{transactionRepo, qrRepo}
 }
 
 type ITransactionUseCase interface {
@@ -29,6 +32,24 @@ func (u *TransactionUseCase) CreateTransaction(ctx context.Context, req *entity.
 	funcName := "TransactionUseCase.CreateTransaction"
 	captureFieldError := generalEntity.CaptureFields{
 		"payload": helper.ToString(req),
+	}
+
+	if req.Amount <= 0 || req.FeeAmount < 0 || req.TotalAmount <= 0 {
+		err := fmt.Errorf("invalid request parameters: %v", captureFieldError)
+		helper.LogError("transactionRepo.CreateTransaction", funcName, err, captureFieldError, "")
+		return nil, err
+	}
+
+	qr, err := u.qrRepo.GetByBillingID(ctx, req.BillingID)
+	if err != nil {
+		helper.LogError("qrRepo.GetByBillingID", funcName, err, captureFieldError, "")
+		return nil, err
+	}
+
+	if qr == nil {
+		err := fmt.Errorf("QR code not found for billing ID: %s", req.BillingID)
+		helper.LogError("qrRepo.GetByBillingID", funcName, err, captureFieldError, "")
+		return nil, err
 	}
 
 	transaction := &mEntity.TransactionEntity{

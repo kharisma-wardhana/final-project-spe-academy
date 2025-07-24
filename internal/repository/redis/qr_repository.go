@@ -29,10 +29,18 @@ func (r *QRRepository) Create(ctx context.Context, qr *entity.QREntity) error {
 		"payload": helper.ToString(qr),
 	}
 
-	if err := r.redisClient.Set(ctx, qr.BillingID, qr, 0).Err(); err != nil {
+	qrJSON, err := json.Marshal(qr)
+
+	if err != nil {
+		helper.LogError("json.Marshal", funcName, err, captureFieldError, "")
+		return err
+	}
+
+	if err := r.redisClient.Set(ctx, qr.BillingID, qrJSON, 0).Err(); err != nil {
 		helper.LogError("redisClient.Set", funcName, err, captureFieldError, "")
 		return err
 	}
+
 	return nil
 }
 
