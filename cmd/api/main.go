@@ -14,6 +14,7 @@ import (
 	"github.com/kharisma-wardhana/final-project-spe-academy/config"
 	_ "github.com/kharisma-wardhana/final-project-spe-academy/docs"
 	"github.com/kharisma-wardhana/final-project-spe-academy/entity"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/http/auth"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/http/handler"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/parser"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/presenter/json"
@@ -107,13 +108,17 @@ func main() {
 
 	api := app.Group("/api/v1")
 
-	// HANDLER : Write handler code here (HTTP, gRPC, etc.)
-	handler.NewAccountHandler(parser, presenterJson, accountUseCase).Register(api)
-	handler.NewMerchantHandler(parser, presenterJson, merchantUseCase, transactionUseCase, qrUseCase).Register(api)
-	handler.NewTransactionHandler(parser, presenterJson, transactionUseCase).Register(api)
-
 	app.Get("/health-check", healthCheck)
 	app.Get("/metrics", monitor.New())
+
+	// HANDLER : Write handler code here (HTTP, gRPC, etc.)
+	handler.NewAccountHandler(parser, presenterJson, accountUseCase).Register(api)
+
+	signature := auth.NewSignature(parser, accountRepo, merchantRepo)
+	app.Use(signature.VerifySignature)
+
+	handler.NewMerchantHandler(parser, presenterJson, merchantUseCase, transactionUseCase, qrUseCase).Register(api)
+	handler.NewTransactionHandler(parser, presenterJson, transactionUseCase).Register(api)
 
 	// Handle Route not found
 	app.Use(routeNotFound)

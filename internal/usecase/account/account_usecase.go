@@ -29,14 +29,14 @@ func NewAccountUseCase(logUseCase usecase_log.ILogUseCase, accountRepo mysql.IAc
 }
 
 type IAccountUseCase interface {
-	GetAccountByID(ctx context.Context, id int64) (*entity.AccountResponse, error)
-	GetAccountByMerchantID(ctx context.Context, merchantID int64) (*entity.AccountResponse, error)
+	GetAccountByID(ctx context.Context, id uint64) (*entity.AccountResponse, error)
+	GetAccountByMerchantID(ctx context.Context, merchantID uint64) (*entity.AccountResponse, error)
 	CreateAccount(ctx context.Context, req *entity.AccountRequest) (*entity.AccountResponse, error)
-	UpdateAccount(ctx context.Context, id int64, req *entity.AccountRequest) (result *entity.AccountResponse, err error)
-	DeleteAccount(ctx context.Context, id int64) error
+	UpdateAccount(ctx context.Context, id uint64, req *entity.AccountRequest) (result *entity.AccountResponse, err error)
+	DeleteAccount(ctx context.Context, id uint64) error
 }
 
-func (u *AccountUseCase) GetAccountByID(ctx context.Context, id int64) (*entity.AccountResponse, error) {
+func (u *AccountUseCase) GetAccountByID(ctx context.Context, id uint64) (*entity.AccountResponse, error) {
 	funcName := "AccountUseCase.GetAccountByID"
 	captureFieldError := generalEntity.CaptureFields{"id": helper.ToString(id)}
 
@@ -59,7 +59,7 @@ func (u *AccountUseCase) GetAccountByID(ctx context.Context, id int64) (*entity.
 	}, nil
 }
 
-func (u *AccountUseCase) GetAccountByMerchantID(ctx context.Context, merchantID int64) (*entity.AccountResponse, error) {
+func (u *AccountUseCase) GetAccountByMerchantID(ctx context.Context, merchantID uint64) (*entity.AccountResponse, error) {
 	funcName := "AccountUseCase.GetAccountByMerchantID"
 	captureFieldError := generalEntity.CaptureFields{
 		"merchantID": helper.ToString(merchantID),
@@ -121,7 +121,7 @@ func (u *AccountUseCase) CreateAccount(ctx context.Context, req *entity.AccountR
 	}, nil
 }
 
-func (u *AccountUseCase) UpdateAccount(ctx context.Context, id int64, req *entity.AccountRequest) (result *entity.AccountResponse, err error) {
+func (u *AccountUseCase) UpdateAccount(ctx context.Context, id uint64, req *entity.AccountRequest) (result *entity.AccountResponse, err error) {
 	funcName := "AccountUseCase.UpdateAccount"
 	captureFieldError := generalEntity.CaptureFields{
 		"payload": helper.ToString(req),
@@ -175,7 +175,7 @@ func (u *AccountUseCase) UpdateAccount(ctx context.Context, id int64, req *entit
 	return result, nil
 }
 
-func (u *AccountUseCase) DeleteAccount(ctx context.Context, id int64) error {
+func (u *AccountUseCase) DeleteAccount(ctx context.Context, id uint64) error {
 	funcName := "AccountUseCase.DeleteAccount"
 	captureFieldError := generalEntity.CaptureFields{
 		"id": helper.ToString(id),

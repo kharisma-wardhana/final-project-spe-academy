@@ -1,7 +1,7 @@
 package entity
 
 type QREntity struct {
-	MerchantID int64
+	MerchantID uint64
 	BillingID  string
 	Amount     float64
 	QRCode     string

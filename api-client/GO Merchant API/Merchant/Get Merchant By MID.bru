@@ -13,3 +13,17 @@ get {
 params:path {
   mid: 1234
 }
+
+headers {
+  X-Client-ID: testID
+  X-Signature: {{x-signature}}
+}
+
+script:pre-request {
+  const crypto = require('crypto');
+  
+  var data = bru.getEnvVar("clientID") + bru.getEnvVar("clientSecret")+bru.getEnvVar("pubKey")
+  var signature = crypto.createHash('sha256').update(data).digest('hex');
+  
+  bru.setEnvVar("x-signature", signature)
+}

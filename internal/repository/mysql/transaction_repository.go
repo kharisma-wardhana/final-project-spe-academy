@@ -13,10 +13,10 @@ import (
 
 type ITransactionRepository interface {
 	TrxSupportRepo
-	FindByID(ctx context.Context, id int64) (*entity.TransactionEntity, error)
+	FindByID(ctx context.Context, id uint64) (*entity.TransactionEntity, error)
 	FindByRefID(ctx context.Context, refID string) (*entity.TransactionEntity, error)
-	FindByMerchantID(ctx context.Context, merchantID int64) ([]entity.TransactionEntity, error)
-	LockByID(ctx context.Context, dbTrx TrxObj, id int64) (*entity.TransactionEntity, error)
+	FindByMerchantID(ctx context.Context, merchantID uint64) ([]entity.TransactionEntity, error)
+	LockByID(ctx context.Context, dbTrx TrxObj, id uint64) (*entity.TransactionEntity, error)
 	Create(ctx context.Context, dbTrx TrxObj, params *entity.TransactionEntity, nonZeroVal bool) error
 }
 
@@ -28,7 +28,7 @@ func NewTransactionRepository(mysql *config.Mysql) *TransactionRepository {
 	return &TransactionRepository{GormTrxSupport{db: mysql.DB}}
 }
 
-func (r *TransactionRepository) FindByID(ctx context.Context, id int64) (*entity.TransactionEntity, error) {
+func (r *TransactionRepository) FindByID(ctx context.Context, id uint64) (*entity.TransactionEntity, error) {
 	funcName := "TransactionRepository.FindByID"
 	if err := helper.CheckDeadline(ctx); err != nil {
 		return nil, errwrap.Wrap(err, funcName)
@@ -58,7 +58,7 @@ func (r *TransactionRepository) FindByRefID(ctx context.Context, refID string) (
 	return &transaction, nil
 }
 
-func (r *TransactionRepository) FindByMerchantID(ctx context.Context, merchantID int64) ([]entity.TransactionEntity, error) {
+func (r *TransactionRepository) FindByMerchantID(ctx context.Context, merchantID uint64) ([]entity.TransactionEntity, error) {
 	funcName := "TransactionRepository.FindByMerchantID"
 	if err := helper.CheckDeadline(ctx); err != nil {
 		return nil, errwrap.Wrap(err, funcName)
@@ -73,7 +73,7 @@ func (r *TransactionRepository) FindByMerchantID(ctx context.Context, merchantID
 	return transactions, nil
 }
 
-func (r *TransactionRepository) LockByID(ctx context.Context, dbTrx TrxObj, id int64) (*entity.TransactionEntity, error) {
+func (r *TransactionRepository) LockByID(ctx context.Context, dbTrx TrxObj, id uint64) (*entity.TransactionEntity, error) {
 	funcName := "TransactionRepository.LockByID"
 	if err := helper.CheckDeadline(ctx); err != nil {
 		return nil, errwrap.Wrap(err, funcName)

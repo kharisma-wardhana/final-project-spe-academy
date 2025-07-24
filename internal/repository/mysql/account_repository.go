@@ -13,12 +13,13 @@ import (
 
 type IAccountRepository interface {
 	TrxSupportRepo
-	LockByID(ctx context.Context, dbTrx TrxObj, id int64) (*entity.AccountEntity, error)
-	FindByID(ctx context.Context, id int64) (*entity.AccountEntity, error)
-	FindByMerchantID(ctx context.Context, merchantID int64) (*entity.AccountEntity, error)
+	LockByID(ctx context.Context, dbTrx TrxObj, id uint64) (*entity.AccountEntity, error)
+	FindByID(ctx context.Context, id uint64) (*entity.AccountEntity, error)
+	FindByMerchantID(ctx context.Context, merchantID uint64) (*entity.AccountEntity, error)
+	FindByClientID(ctx context.Context, clientID string) (*entity.AccountEntity, error)
 	Create(ctx context.Context, dbTrx TrxObj, params *entity.AccountEntity, nonZeroVal bool) error
 	Update(ctx context.Context, dbTrx TrxObj, params *entity.AccountEntity, changes *entity.AccountEntity) (err error)
-	DeleteByID(ctx context.Context, dbTrx TrxObj, id int64) error
+	DeleteByID(ctx context.Context, dbTrx TrxObj, id uint64) error
 }
 
 type AccountRepository struct {
@@ -29,7 +30,7 @@ func NewAccountRepository(mysql *config.Mysql) *AccountRepository {
 	return &AccountRepository{GormTrxSupport{db: mysql.DB}}
 }
 
-func (r *AccountRepository) FindByID(ctx context.Context, id int64) (*entity.AccountEntity, error) {
+func (r *AccountRepository) FindByID(ctx context.Context, id uint64) (*entity.AccountEntity, error) {
 	funcName := "AccountRepository.FindByID"
 	if err := helper.CheckDeadline(ctx); err != nil {
 		return nil, errwrap.Wrap(err, funcName)
@@ -48,7 +49,7 @@ func (r *AccountRepository) FindByID(ctx context.Context, id int64) (*entity.Acc
 	return &account, nil
 }
 
-func (r *AccountRepository) FindByMerchantID(ctx context.Context, id int64) (*entity.AccountEntity, error) {
+func (r *AccountRepository) FindByMerchantID(ctx context.Context, id uint64) (*entity.AccountEntity, error) {
 	funcName := "AccountRepository.FindByMerchantID"
 	if err := helper.CheckDeadline(ctx); err != nil {
 		return nil, errwrap.Wrap(err, funcName)
@@ -61,6 +62,25 @@ func (r *AccountRepository) FindByMerchantID(ctx context.Context, id int64) (*en
 		Error; err != nil {
 		return nil, err
 	}
+	return &account, nil
+}
+
+func (r *AccountRepository) FindByClientID(ctx context.Context, clientID string) (*entity.AccountEntity, error) {
+	funcName := "AccountRepository.FindByClientID"
+	if err := helper.CheckDeadline(ctx); err != nil {
+		return nil, errwrap.Wrap(err, funcName)
+	}
+	var account entity.AccountEntity
+	if err := r.db.
+		Raw("SELECT * FROM accounts WHERE client_id = ?", clientID).
+		First(&account).
+		Error; err != nil {
+		if errwrap.Is(err, gorm.ErrRecordNotFound) {
+			return nil, appErr.ErrRecordNotFound()
+		}
+		return nil, err
+	}
+
 	return &account, nil
 }
 
@@ -94,7 +114,7 @@ func (r *AccountRepository) Update(ctx context.Context, dbTrx TrxObj, params *en
 	return nil
 }
 
-func (r *AccountRepository) DeleteByID(ctx context.Context, dbTrx TrxObj, id int64) error {
+func (r *AccountRepository) DeleteByID(ctx context.Context, dbTrx TrxObj, id uint64) error {
 	funcName := "AccountRepository.DeleteByID"
 	if err := helper.CheckDeadline(ctx); err != nil {
 		return errwrap.Wrap(err, funcName)
@@ -109,7 +129,7 @@ func (r *AccountRepository) DeleteByID(ctx context.Context, dbTrx TrxObj, id int
 	return nil
 }
 
-func (r *AccountRepository) LockByID(ctx context.Context, dbTrx TrxObj, id int64) (*entity.AccountEntity, error) {
+func (r *AccountRepository) LockByID(ctx context.Context, dbTrx TrxObj, id uint64) (*entity.AccountEntity, error) {
 	funcName := "AccountRepository.LockByID"
 	if err := helper.CheckDeadline(ctx); err != nil {
 		return nil, errwrap.Wrap(err, funcName)

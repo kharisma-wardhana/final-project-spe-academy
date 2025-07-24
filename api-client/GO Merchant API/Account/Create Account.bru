@@ -12,11 +12,24 @@ post {
 
 body:json {
   {
-    "merchant_id": 1,
+    "merchant_id": 4,
     "client_id": "testID",
     "client_secret": "testSecret",
     "private_key": "aaa",
     "public_key": "bbb",
     "status": "Active"
   }
+}
+
+script:post-response {
+  var clientID = res.body.data.client_id;
+  var clientSecret = res.body.data.client_secret;
+  var pubKey = res.body.data.public_key;
+  var privKey = res.body.data.private_key;
+  
+  bru.setEnvVar("clientID", clientID)
+  bru.setEnvVar("clientSecret", clientSecret)
+  bru.setEnvVar("pubKey", pubKey)
+  bru.setEnvVar("privKey", privKey)
+  
 }

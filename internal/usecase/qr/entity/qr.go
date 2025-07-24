@@ -1,7 +1,7 @@
 package entity
 
 type QRRequest struct {
-	MerchantID int64   `json:"merchant_id"`
+	MerchantID uint64  `json:"merchant_id"`
 	Amount     float64 `json:"amount"`
 	Currency   string  `json:"currency"`
 	Expiration int64   `json:"expiration"` // in seconds

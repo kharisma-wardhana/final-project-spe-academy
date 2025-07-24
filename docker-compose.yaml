@@ -1,26 +1,18 @@
 version: "3.7"
 services:
-  skeleton-api-dev:
-    container_name: go-skeleton
-    image: go-skeleton-api:1.0.1
+  merchant-api-dev:
+    container_name: go-merchant-api
+    image: go-merchant-api:1.0.1
     ports:
       - 8760:7011
     env_file:
       - ./.env
     network_mode: bridge
 
-  skeleton-worker-log:
-    container_name: go-skeleton-worker-log
-    image: go-skeleton-worker:1.0.1
+  merchant-worker-log:
+    container_name: go-merchant-worker-log
+    image: go-merchant-worker:1.0.1
     env_file:
       - ./.env
-    command: [ "log.insert" ]
-    network_mode: bridge
-
-  skeleton-worker-example:
-    container_name: go-skeleton-worker-example
-    image: go-skeleton-worker:1.0.1
-    env_file:
-      - ./.env
-    command: [ "example.consumer" ]
+    command: ["log.insert"]
     network_mode: bridge

@@ -32,7 +32,7 @@ func NewTransactionUseCase(logUseCase usecase_log.ILogUseCase, transactionRepo m
 
 type ITransactionUseCase interface {
 	CreateTransaction(ctx context.Context, req *entity.TransactionRequest) (*entity.TransactionResponse, error)
-	GetTransactionsByMerchantID(ctx context.Context, merchantID int64) ([]*entity.TransactionResponse, error)
+	GetTransactionsByMerchantID(ctx context.Context, merchantID uint64) ([]*entity.TransactionResponse, error)
 	GetTransactionsByRefID(ctx context.Context, refID string) (*entity.TransactionResponse, error)
 }
 
@@ -106,7 +106,7 @@ func (u *TransactionUseCase) CreateTransaction(ctx context.Context, req *entity.
 	}, nil
 }
 
-func (u *TransactionUseCase) GetTransactionsByMerchantID(ctx context.Context, merchantID int64) ([]*entity.TransactionResponse, error) {
+func (u *TransactionUseCase) GetTransactionsByMerchantID(ctx context.Context, merchantID uint64) ([]*entity.TransactionResponse, error) {
 	funcName := "TransactionUseCase.GetTransactionsByMerchantID"
 	captureFieldError := generalEntity.CaptureFields{"merchantID": helper.ToString(merchantID)}
 

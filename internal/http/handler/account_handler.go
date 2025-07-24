@@ -44,7 +44,7 @@ func (h *AccountHandler) GetAccountByID(c *fiber.Ctx) error {
 		return h.presenter.BuildError(c, err)
 	}
 
-	account, err := h.usecase.GetAccountByID(c.Context(), id)
+	account, err := h.usecase.GetAccountByID(c.Context(), uint64(id))
 	if err != nil {
 		return h.presenter.BuildError(c, err)
 	}
@@ -58,7 +58,7 @@ func (h *AccountHandler) GetAccountMerchants(c *fiber.Ctx) error {
 		return h.presenter.BuildError(c, err)
 	}
 
-	account, err := h.usecase.GetAccountByMerchantID(c.Context(), id)
+	account, err := h.usecase.GetAccountByMerchantID(c.Context(), uint64(id))
 	if err != nil {
 		return h.presenter.BuildError(c, err)
 	}
@@ -94,7 +94,7 @@ func (h *AccountHandler) UpdateAccount(c *fiber.Ctx) error {
 		return h.presenter.BuildError(c, err)
 	}
 
-	accountResponse, err := h.usecase.UpdateAccount(c.Context(), id, accountRequest)
+	accountResponse, err := h.usecase.UpdateAccount(c.Context(), uint64(id), accountRequest)
 	if err != nil {
 		return h.presenter.BuildError(c, err)
 	}
@@ -108,7 +108,7 @@ func (h *AccountHandler) DeleteAccount(c *fiber.Ctx) error {
 		return h.presenter.BuildError(c, err)
 	}
 
-	err = h.usecase.DeleteAccount(c.Context(), id)
+	err = h.usecase.DeleteAccount(c.Context(), uint64(id))
 	if err != nil {
 		return h.presenter.BuildError(c, err)
 	}

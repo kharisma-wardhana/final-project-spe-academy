@@ -38,6 +38,14 @@ func ErrInvalidToken() CustomErrorResponse {
 	}
 }
 
+func ErrInvalidSignature() CustomErrorResponse {
+	return CustomErrorResponse{
+		Message:  entity.INVALID_SIGNATURE_MSG,
+		ErrCode:  entity.INVALID_SIGNATURE_CODE,
+		HTTPCode: http.StatusUnauthorized,
+	}
+}
+
 func ErrInvalidPayload(meta []entity.ErrorResponse) CustomErrorResponseWithMeta {
 	return CustomErrorResponseWithMeta{
 		Message:  entity.INVALID_PAYLOAD_MSG,

@@ -13,12 +13,12 @@ import (
 
 type IMerchantRepository interface {
 	TrxSupportRepo
-	FindByID(ctx context.Context, id int64) (*entity.MerchantEntity, error)
+	FindByID(ctx context.Context, id uint64) (*entity.MerchantEntity, error)
 	FindByMID(ctx context.Context, mid string) (*entity.MerchantEntity, error)
-	LockByID(ctx context.Context, dbTrx TrxObj, id int64) (result *entity.MerchantEntity, err error)
+	LockByID(ctx context.Context, dbTrx TrxObj, id uint64) (result *entity.MerchantEntity, err error)
 	Create(ctx context.Context, dbTrx TrxObj, params *entity.MerchantEntity, nonZeroVal bool) error
 	Update(ctx context.Context, dbTrx TrxObj, params *entity.MerchantEntity, changes *entity.MerchantEntity) (err error)
-	DeleteByID(ctx context.Context, dbTrx TrxObj, id int64) error
+	DeleteByID(ctx context.Context, dbTrx TrxObj, id uint64) error
 }
 
 type MerchantRepository struct {
@@ -29,7 +29,7 @@ func NewMerchantRepository(mysql *config.Mysql) *MerchantRepository {
 	return &MerchantRepository{GormTrxSupport{db: mysql.DB}}
 }
 
-func (r *MerchantRepository) FindByID(ctx context.Context, id int64) (*entity.MerchantEntity, error) {
+func (r *MerchantRepository) FindByID(ctx context.Context, id uint64) (*entity.MerchantEntity, error) {
 	funcName := "MerchantRepository.FindByID"
 	if err := helper.CheckDeadline(ctx); err != nil {
 		return nil, errwrap.Wrap(err, funcName)
@@ -69,7 +69,7 @@ func (r *MerchantRepository) FindByMID(ctx context.Context, mid string) (*entity
 	return &merchant, nil
 }
 
-func (r *MerchantRepository) LockByID(ctx context.Context, dbTrx TrxObj, id int64) (result *entity.MerchantEntity, err error) {
+func (r *MerchantRepository) LockByID(ctx context.Context, dbTrx TrxObj, id uint64) (result *entity.MerchantEntity, err error) {
 	funcName := "MerchantRepository.LockByID"
 	if err := helper.CheckDeadline(ctx); err != nil {
 		return nil, errwrap.Wrap(err, funcName)
@@ -116,7 +116,7 @@ func (r *MerchantRepository) Update(ctx context.Context, dbTrx TrxObj, params *e
 	return nil
 }
 
-func (r *MerchantRepository) DeleteByID(ctx context.Context, dbTrx TrxObj, id int64) error {
+func (r *MerchantRepository) DeleteByID(ctx context.Context, dbTrx TrxObj, id uint64) error {
 	funcName := "MerchantRepository.DeleteByID"
 	if err := helper.CheckDeadline(ctx); err != nil {
 		return errwrap.Wrap(err, funcName)

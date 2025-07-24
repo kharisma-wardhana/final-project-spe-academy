@@ -29,9 +29,9 @@ func NewMerchantUseCase(logUseCase usecase_log.ILogUseCase, merchantRepo mysql.I
 
 type IMerchantUseCase interface {
 	CreateMerchant(ctx context.Context, req *entity.MerchantRequest) (*entity.MerchantResponse, error)
-	UpdateMerchant(ctx context.Context, id int64, req *entity.MerchantRequest) (*entity.MerchantResponse, error)
+	UpdateMerchant(ctx context.Context, id uint64, req *entity.MerchantRequest) (*entity.MerchantResponse, error)
 	GetMerchantByMID(ctx context.Context, mid string) (*entity.MerchantResponse, error)
-	DeleteMerchantByID(ctx context.Context, id int64) error
+	DeleteMerchantByID(ctx context.Context, id uint64) error
 }
 
 func (u *MerchantUseCase) CreateMerchant(ctx context.Context, req *entity.MerchantRequest) (*entity.MerchantResponse, error) {
@@ -116,7 +116,7 @@ func (u *MerchantUseCase) GetMerchantByMID(ctx context.Context, mid string) (*en
 	}, nil
 }
 
-func (u *MerchantUseCase) UpdateMerchant(ctx context.Context, id int64, req *entity.MerchantRequest) (result *entity.MerchantResponse, err error) {
+func (u *MerchantUseCase) UpdateMerchant(ctx context.Context, id uint64, req *entity.MerchantRequest) (result *entity.MerchantResponse, err error) {
 	funcName := "MerchantUseCase.UpdateMerchant"
 	captureFieldError := generalEntity.CaptureFields{
 		"id":      helper.ToString(id),
@@ -182,7 +182,7 @@ func (u *MerchantUseCase) UpdateMerchant(ctx context.Context, id int64, req *ent
 	return result, nil
 }
 
-func (u *MerchantUseCase) DeleteMerchantByID(ctx context.Context, id int64) error {
+func (u *MerchantUseCase) DeleteMerchantByID(ctx context.Context, id uint64) error {
 	funcName := "MerchantUseCase.DeleteMerchantByID"
 	captureFieldError := generalEntity.CaptureFields{"id": helper.ToString(id)}
 

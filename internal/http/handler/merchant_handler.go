@@ -79,7 +79,7 @@ func (h *MerchantHandler) UpdateMerchant(c *fiber.Ctx) error {
 		return h.presenter.BuildError(c, err)
 	}
 
-	merchant, err := h.merchantUseCase.UpdateMerchant(c.Context(), id, &req)
+	merchant, err := h.merchantUseCase.UpdateMerchant(c.Context(), uint64(id), &req)
 	if err != nil {
 		return h.presenter.BuildError(c, err)
 	}
@@ -93,7 +93,7 @@ func (h *MerchantHandler) DeleteMerchant(c *fiber.Ctx) error {
 		return h.presenter.BuildError(c, err)
 	}
 
-	if err := h.merchantUseCase.DeleteMerchantByID(c.Context(), id); err != nil {
+	if err := h.merchantUseCase.DeleteMerchantByID(c.Context(), uint64(id)); err != nil {
 		return h.presenter.BuildError(c, err)
 	}
 
@@ -106,7 +106,7 @@ func (h *MerchantHandler) GetMerchantTransactions(c *fiber.Ctx) error {
 		return h.presenter.BuildError(c, err)
 	}
 
-	transactions, err := h.transactionUseCase.GetTransactionsByMerchantID(c.Context(), id)
+	transactions, err := h.transactionUseCase.GetTransactionsByMerchantID(c.Context(), uint64(id))
 	if err != nil {
 		return h.presenter.BuildError(c, err)
 	}
@@ -124,7 +124,7 @@ func (h *MerchantHandler) CreateQRForMerchant(c *fiber.Ctx) error {
 	if err := h.parser.ParserBodyRequest(c, &req); err != nil {
 		return h.presenter.BuildError(c, err)
 	}
-	req.MerchantID = id
+	req.MerchantID = uint64(id)
 	qr, err := h.qrUseCase.GenerateQR(c.Context(), req)
 	if err != nil {
 		return h.presenter.BuildError(c, err)
