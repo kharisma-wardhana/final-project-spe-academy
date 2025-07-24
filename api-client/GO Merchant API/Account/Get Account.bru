@@ -1,11 +1,11 @@
 meta {
-  name: Delete
+  name: Get Account
   type: http
-  seq: 5
+  seq: 2
 }
 
-delete {
-  url: {{url}}/api/v1/categories/:id
+get {
+  url: {{local}}/api/v1/accounts/:id
   body: none
   auth: inherit
 }

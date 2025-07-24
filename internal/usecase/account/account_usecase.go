@@ -45,7 +45,11 @@ func (u *AccountUseCase) GetAccountByID(ctx context.Context, id int64) (*entity.
 		MerchantID:   account.MerchantID,
 		ClientID:     account.ClientID,
 		ClientSecret: account.ClientSecret,
+		PrivateKey:   account.PrivateKey,
+		PublicKey:    account.PublicKey,
 		Status:       account.Status,
+		CreatedAt:    helper.ConvertToJakartaDate(account.CreatedAt),
+		UpdatedAt:    helper.ConvertToJakartaDate(account.UpdatedAt),
 	}, nil
 }
 
@@ -66,7 +70,11 @@ func (u *AccountUseCase) GetAccountByMerchantID(ctx context.Context, merchantID 
 		MerchantID:   account.MerchantID,
 		ClientID:     account.ClientID,
 		ClientSecret: account.ClientSecret,
+		PrivateKey:   account.PrivateKey,
+		PublicKey:    account.PublicKey,
 		Status:       account.Status,
+		CreatedAt:    helper.ConvertToJakartaDate(account.CreatedAt),
+		UpdatedAt:    helper.ConvertToJakartaDate(account.UpdatedAt),
 	}, nil
 }
 
@@ -95,6 +103,8 @@ func (u *AccountUseCase) CreateAccount(ctx context.Context, req *entity.AccountR
 		MerchantID:   accountEntity.MerchantID,
 		ClientID:     accountEntity.ClientID,
 		ClientSecret: accountEntity.ClientSecret,
+		PrivateKey:   accountEntity.PrivateKey,
+		PublicKey:    accountEntity.PublicKey,
 		Status:       accountEntity.Status,
 		CreatedAt:    helper.ConvertToJakartaDate(accountEntity.CreatedAt),
 		UpdatedAt:    helper.ConvertToJakartaDate(accountEntity.UpdatedAt),

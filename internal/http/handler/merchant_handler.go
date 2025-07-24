@@ -8,6 +8,8 @@ import (
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/presenter/json"
 	usecase_merchant "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/merchant"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/merchant/entity"
+	usecase_qr "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/qr"
+	qrEntity "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/qr/entity"
 	usecase_transaction "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/transaction"
 )
 
@@ -16,6 +18,7 @@ type MerchantHandler struct {
 	presenter          json.JsonPresenter
 	merchantUseCase    usecase_merchant.IMerchantUseCase
 	transactionUseCase usecase_transaction.ITransactionUseCase
+	qrUseCase          usecase_qr.IQRUseCase
 }
 
 func NewMerchantHandler(
@@ -23,8 +26,9 @@ func NewMerchantHandler(
 	presenter json.JsonPresenter,
 	merchantUseCase usecase_merchant.IMerchantUseCase,
 	transactionUseCase usecase_transaction.ITransactionUseCase,
+	qrUseCase usecase_qr.IQRUseCase,
 ) *MerchantHandler {
-	return &MerchantHandler{parser, presenter, merchantUseCase, transactionUseCase}
+	return &MerchantHandler{parser, presenter, merchantUseCase, transactionUseCase, qrUseCase}
 }
 
 func (h *MerchantHandler) Register(app fiber.Router) {
@@ -34,6 +38,7 @@ func (h *MerchantHandler) Register(app fiber.Router) {
 	app.Put("/merchants/:id", h.UpdateMerchant)
 	app.Delete("/merchants/:id", h.DeleteMerchant)
 	app.Get("/merchants/:id/transactions", h.GetMerchantTransactions)
+	app.Post("/merchants/:id/qr", h.CreateQRForMerchant)
 }
 
 func (h *MerchantHandler) GetMerchantByID(c *fiber.Ctx) error {
@@ -107,4 +112,23 @@ func (h *MerchantHandler) GetMerchantTransactions(c *fiber.Ctx) error {
 	}
 
 	return h.presenter.BuildSuccess(c, transactions, "Merchant transactions successfully retrieved", http.StatusOK)
+}
+
+func (h *MerchantHandler) CreateQRForMerchant(c *fiber.Ctx) error {
+	id, err := h.parser.ParserIntIDFromPathParams(c)
+	if err != nil {
+		return h.presenter.BuildError(c, err)
+	}
+
+	var req qrEntity.QRRequest
+	if err := h.parser.ParserBodyRequest(c, &req); err != nil {
+		return h.presenter.BuildError(c, err)
+	}
+	req.MerchantID = id
+	qr, err := h.qrUseCase.GenerateQR(c.Context(), req)
+	if err != nil {
+		return h.presenter.BuildError(c, err)
+	}
+
+	return h.presenter.BuildSuccess(c, qr, "QR code successfully created", http.StatusCreated)
 }

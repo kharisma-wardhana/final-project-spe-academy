@@ -1,0 +1,15 @@
+meta {
+  name: Get Transaction By RefID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{local}}/api/v1/transactions/:refId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  refId: 
+}

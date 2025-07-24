@@ -18,9 +18,11 @@ import (
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/parser"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/presenter/json"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/redis"
 	usecase_account "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/account"
 	usecase_log "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/log"
 	usecase_merchant "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/merchant"
+	usecase_qr "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/qr"
 	usecase_transaction "github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/transaction"
 
 	"github.com/gin-contrib/cors"
@@ -75,7 +77,7 @@ func main() {
 	}
 
 	// Redis Configuration (if needed)
-	// redisDB := config.NewRedis(&cfg.RedisOption)
+	redisDB := config.NewRedis(&cfg.RedisOption)
 
 	// MySQL/MariaDB Initialization
 	gormLogger := config.NewGormLogMysqlConfig(&cfg.MysqlOption)
@@ -90,18 +92,20 @@ func main() {
 	accountRepo := mysql.NewAccountRepository(mysqlDB)
 	merchantRepo := mysql.NewMerchantRepository(mysqlDB)
 	transactionRepo := mysql.NewTransactionRepository(mysqlDB)
+	qrRepo := redis.NewQRRepository(redisDB)
 
 	// USECASE : Write bussines logic code here (validation, business logic, etc.)
 	_ = usecase_log.NewLogUsecase(queue, logger)
 	accountUseCase := usecase_account.NewAccountUseCase(accountRepo)
 	merchantUseCase := usecase_merchant.NewMerchantUseCase(merchantRepo)
 	transactionUseCase := usecase_transaction.NewTransactionUseCase(transactionRepo)
+	qrUseCase := usecase_qr.NewQRUseCase(qrRepo)
 
 	api := app.Group("/api/v1")
 
 	// HANDLER : Write handler code here (HTTP, gRPC, etc.)
 	handler.NewAccountHandler(parser, presenterJson, accountUseCase).Register(api)
-	handler.NewMerchantHandler(parser, presenterJson, merchantUseCase, transactionUseCase).Register(api)
+	handler.NewMerchantHandler(parser, presenterJson, merchantUseCase, transactionUseCase, qrUseCase).Register(api)
 	handler.NewTransactionHandler(parser, presenterJson, transactionUseCase).Register(api)
 
 	app.Get("/health-check", healthCheck)

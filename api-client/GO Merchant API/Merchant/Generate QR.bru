@@ -1,0 +1,23 @@
+meta {
+  name: Generate QR
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{local}}/api/v1/merchants/:id/qr
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 123
+}
+
+body:json {
+  {
+    "amount": 100.00,
+    "currency": "360",
+    "expiration": 200
+  }
+}

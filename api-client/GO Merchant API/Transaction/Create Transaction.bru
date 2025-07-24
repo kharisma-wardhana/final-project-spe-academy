@@ -1,0 +1,29 @@
+meta {
+  name: Create Transaction
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{local}}/api/v1/transactions
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "reference_id": "REF12345",
+    "billing_id": "123444",
+    "merchant_id": "123",
+    "amount": "100.00",
+    "fee_amount": "0.00",
+    "total_amount": "100.00",
+    "mdr_percent": "0.3",
+    "mdr_amount": "30.00",
+    "payment_method": "QRIS",
+    "currency": "360",
+    "type": "Payment",
+    "customer_mpan": "9801203901922",
+    "status": "PENDING"
+  }
+}
