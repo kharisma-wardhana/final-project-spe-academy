@@ -10,7 +10,9 @@ import (
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql"
 	mEntity "github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql/entity"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/redis"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/transaction/entity"
+	errWrap "github.com/pkg/errors"
 )
 
 type TransactionUseCase struct {
@@ -32,6 +34,10 @@ func (u *TransactionUseCase) CreateTransaction(ctx context.Context, req *entity.
 	funcName := "TransactionUseCase.CreateTransaction"
 	captureFieldError := generalEntity.CaptureFields{
 		"payload": helper.ToString(req),
+	}
+
+	if err := usecase.ValidateStruct(*req); err != "" {
+		return nil, errWrap.Wrap(fmt.Errorf(generalEntity.INVALID_PAYLOAD_CODE), err)
 	}
 
 	if req.Amount <= 0 || req.FeeAmount < 0 || req.TotalAmount <= 0 {

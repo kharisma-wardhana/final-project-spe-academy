@@ -2,13 +2,16 @@ package usecase_merchant
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	generalEntity "github.com/kharisma-wardhana/final-project-spe-academy/entity"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/helper"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql"
 	mEntity "github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql/entity"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/merchant/entity"
+	errWrap "github.com/pkg/errors"
 )
 
 type MerchantUseCase struct {
@@ -32,6 +35,9 @@ func (u *MerchantUseCase) CreateMerchant(ctx context.Context, req *entity.Mercha
 	funcName := "MerchantUseCase.CreateMerchant"
 	captureFieldError := generalEntity.CaptureFields{
 		"payload": helper.ToString(req),
+	}
+	if err := usecase.ValidateStruct(*req); err != "" {
+		return nil, errWrap.Wrap(fmt.Errorf(generalEntity.INVALID_PAYLOAD_CODE), err)
 	}
 	merchant := &mEntity.MerchantEntity{
 		Name:          req.Name,
@@ -111,6 +117,9 @@ func (u *MerchantUseCase) UpdateMerchant(ctx context.Context, id int64, req *ent
 	captureFieldError := generalEntity.CaptureFields{
 		"id":      helper.ToString(id),
 		"payload": helper.ToString(req),
+	}
+	if err := usecase.ValidateStruct(*req); err != "" {
+		return nil, errWrap.Wrap(fmt.Errorf(generalEntity.INVALID_PAYLOAD_CODE), err)
 	}
 
 	if err := mysql.DBTransaction(u.merchantRepo, func(dbTrx mysql.TrxObj) error {

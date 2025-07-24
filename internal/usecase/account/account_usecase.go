@@ -9,8 +9,9 @@ import (
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/helper"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql"
 	mEntity "github.com/kharisma-wardhana/final-project-spe-academy/internal/repository/mysql/entity"
+	"github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase"
 	"github.com/kharisma-wardhana/final-project-spe-academy/internal/usecase/account/entity"
-	errwrap "github.com/pkg/errors"
+	errWrap "github.com/pkg/errors"
 )
 
 type AccountUseCase struct {
@@ -83,6 +84,9 @@ func (u *AccountUseCase) CreateAccount(ctx context.Context, req *entity.AccountR
 	captureFieldError := generalEntity.CaptureFields{
 		"payload": helper.ToString(req),
 	}
+	if err := usecase.ValidateStruct(*req); err != "" {
+		return nil, errWrap.Wrap(fmt.Errorf(generalEntity.INVALID_PAYLOAD_CODE), err)
+	}
 	var accountEntity = &mEntity.AccountEntity{
 		MerchantID:   req.MerchantID,
 		ClientID:     req.ClientID,
@@ -115,6 +119,9 @@ func (u *AccountUseCase) UpdateAccount(ctx context.Context, id int64, req *entit
 	funcName := "AccountUseCase.UpdateAccount"
 	captureFieldError := generalEntity.CaptureFields{
 		"payload": helper.ToString(req),
+	}
+	if err := usecase.ValidateStruct(*req); err != "" {
+		return nil, errWrap.Wrap(fmt.Errorf(generalEntity.INVALID_PAYLOAD_CODE), err)
 	}
 
 	if err := mysql.DBTransaction(u.accountRepo, func(dbTrx mysql.TrxObj) error {
@@ -153,7 +160,7 @@ func (u *AccountUseCase) UpdateAccount(ctx context.Context, id int64, req *entit
 		return nil
 	}); err != nil {
 		helper.LogError("accountRepo.DBTransaction", funcName, err, captureFieldError, "")
-		return nil, errwrap.Wrap(err, funcName)
+		return nil, errWrap.Wrap(err, funcName)
 	}
 
 	return result, nil
