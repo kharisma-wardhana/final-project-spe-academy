@@ -112,12 +112,12 @@ func main() {
 	app.Get("/metrics", monitor.New())
 
 	// HANDLER : Write handler code here (HTTP, gRPC, etc.)
+	handler.NewMerchantHandler(parser, presenterJson, merchantUseCase, transactionUseCase, qrUseCase).Register(api)
 	handler.NewAccountHandler(parser, presenterJson, accountUseCase).Register(api)
 
 	signature := auth.NewSignature(parser, accountRepo, merchantRepo)
 	app.Use(signature.VerifySignature)
 
-	handler.NewMerchantHandler(parser, presenterJson, merchantUseCase, transactionUseCase, qrUseCase).Register(api)
 	handler.NewTransactionHandler(parser, presenterJson, transactionUseCase).Register(api)
 
 	// Handle Route not found

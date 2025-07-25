@@ -2,18 +2,25 @@
 
 ## Simple Merchant API
 
-Project ini adalah implementasi sederhana untuk pengelolaan merchant menggunakan Golang dan Fiber. API ini mendukung operasi CRUD merchant, akun, dan transaksi, serta integrasi dengan database, message queue.
+Project ini adalah implementasi sederhana untuk pengelolaan merchant menggunakan Golang boilerplate (GoFiber). API ini mendukung operasi CRUD merchant, account, dan transaction, serta integrasi dengan database(MySQL, Redis, MongoDB), message queue(RabbitMQ).
 
 ## Latar Belakang
 
-Sistem ini dibuat untuk mendemonstrasikan arsitektur microservice, pengelolaan data merchant, serta integrasi dengan beberapa komponen seperti database, message queue, dan autentikasi.
+Sistem ini dibuat untuk mendemonstrasikan arsitektur sederhana merchant api (pengelolaan data merchant, generate credential account, generate qris, dan create transaction), serta integrasi dengan beberapa komponen seperti database, message queue, dan autentikasi dengan signature.
 
 ## System Design Architecture
 
-Lihat detail arsitektur pada `docs/architecture/project-structure.md`.
+Flow Merchant API
+![Flow Merchant API](./docs/architecture/Flow%20Merchant%20API%20.png)
+
+Merchant API Design
+![API Design](./docs/architecture/Merchant%20API%20Design%20.png)
+
+Detail arsitektur folder pada `docs/architecture/project-structure.md`.
 
 ## Database Schema Design
 
+![Database Diagram](./docs/architecture/DB%20Diagram.png)
 Skema database dapat ditemukan pada folder `database/migration/`.
 
 ## Tech Stacks
