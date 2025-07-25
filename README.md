@@ -11,7 +11,7 @@ Sistem ini dibuat untuk mendemonstrasikan arsitektur sederhana merchant api (pen
 ## System Design Architecture
 
 Flow Merchant API
-![Flow Merchant API](./docs/architecture/Flow%20Merchant%20API%20.png)
+![Flow Merchant API](./docs/architecture/Flow%20Merchant%20API.png)
 
 Merchant API Design
 ![API Design](./docs/architecture/Merchant%20API%20Design%20.png)
