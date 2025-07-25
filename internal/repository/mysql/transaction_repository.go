@@ -50,10 +50,13 @@ func (r *TransactionRepository) FindByRefID(ctx context.Context, refID string) (
 	}
 	var transaction entity.TransactionEntity
 	if err := r.db.
-		Raw("SELECT * FROM transactions WHERE ref_id = ?", refID).
+		Raw("SELECT * FROM transactions WHERE reference_id = ?", refID).
 		Scan(&transaction).
 		Error; err != nil {
 		return nil, err
+	}
+	if transaction.ID == 0 {
+		return nil, appErr.ErrRecordNotFound()
 	}
 	return &transaction, nil
 }
